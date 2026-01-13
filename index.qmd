@@ -1,14 +1,10 @@
 ---
-title: "My website and data analysis portfolio"
+title: "Joe Dainis's Website and Portfolio"
 ---
 
-**Feel free to change the text below any way you want 😁!**
+# Howdy Howdy Howdy
 
-# Hello
-
-### And hello again
-
-Welcome to **my website** and _data analysis portfolio._ 
+Welcome to **The Joe Show** and _data analysis portfolio._ 
 
 
 * Please use the `Menu Bar` above to look around.
