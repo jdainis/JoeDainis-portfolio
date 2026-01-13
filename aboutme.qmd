@@ -25,17 +25,24 @@ I have decided to include two things that I found interesting. First, I wanted t
 A second material I have included here is a link to a website that discusses applications of data analysis to infectious diseases. Pathogens are one of my core interests, so much of what I would like to apply data analysis techniques to would be related to pathogens and the diseases they cause. I appreciated the breakdown that this toolkit site offered for all of the steps to consider for the different types of datasets you could work with, from pathogen data to human data to socioeconomics.
 <https://www.infectious-diseases-toolkit.org/data-analysis/>
 
-# Joe's List of Top Travel Destinations
+```markdown
+# Joe’s List of Top Travel Destinations
+
 1. **Japan**
-  - I was supposed to travel to Japan for 4 weeks, but this was canceled due to the COVID-19 pandemic. I NEED TO GO.
+   - I was supposed to travel to Japan for 4 weeks, but this was canceled due to the COVID-19 pandemic. I NEED TO GO.
+
 2. **Argentina/Brazil**
-  - I want to do a backpacking trip through Patagonia!
+   - I want to do a backpacking trip through Patagonia!
+
 3. **Southeast Asia (Thailand, Vietnam, Laos)**
-  - Namely for the FOOD
+   - Namely for the FOOD
+
 4. **Iceland**
-  - The nature looks fantastic and I would love to see the Aurora Borealis some day
+   - The nature looks fantastic and I would love to see the Aurora Borealis some day
+
 5. **India**
-  - I have traveled to India before and visited Himachal Pradesh and Delhi. I want to visit South India since I have heard the culture and food is so different from North India!
+   - I have traveled to India before and visited Himachal Pradesh and Delhi. I want to visit South India since I have heard the culture and food is so different from North India!
+```
 
 # Joe's Journey
 ```{mermaid}
