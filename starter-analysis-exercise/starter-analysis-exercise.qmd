@@ -43,10 +43,10 @@ summary(africapop)
 library("ggplot2")
 
 #Make a plot of life expectancy versus infant mortality
-ggplot(data = africainfantmortal, aes(x = life_expectancy, y = infant_mortality)) + geom_point()
+ggplot(data = africainfantmortal, aes(x = infant_mortality, y = life_expectancy)) + geom_point(color = "green") + labs(x = "Infant Mortality", y = "Life Expectancy")
 
 #Make a plot of life expectancy versus population, with population on a log scale
-ggplot(data = africapop, aes(x = life_expectancy, y = population)) + geom_point() + scale_y_log10()
+ggplot(data = africapop, aes(x = population, y = life_expectancy)) + geom_point(color = "pink") + scale_x_log10() + labs(x = "Population (log10)", y = "Life Expectancy")
 
 #The reason that we see streaks of data is because of this data being collected over time and there are different years for different countries being sampled.
 
@@ -66,10 +66,11 @@ africainfantmortal2000 = select(africa2000, c('infant_mortality','life_expectanc
 africapop2000 = select(africa2000, c('population','life_expectancy'))
 
 ##Make a plot of life expectancy versus infant mortality for 2000 Africa Data
-ggplot(data = africainfantmortal2000, aes(x = life_expectancy, y = infant_mortality)) + geom_point()
+ggplot(data = africainfantmortal2000, aes(x = infant_mortality, y = life_expectancy)) + geom_point(color = "dark green") + labs(x = "Infant Mortality", y = "Life Expectancy")
+
 
 ##Make a plot of life expectancy versus population, with population on a log scale for 2000 Africa Data
-ggplot(data = africapop2000, aes(x = life_expectancy, y = population)) + geom_point() + scale_y_log10()
+ggplot(data = africapop2000, aes(x = population, y = life_expectancy)) + geom_point(color = "red") + scale_x_log10() + labs(x = "Population (log10)", y = "Life Expectancy")
 
 #Fit a linear model with infant_mortality as the predictor
 model_infant = lm(life_expectancy ~ infant_mortality, data = africainfantmortal2000)

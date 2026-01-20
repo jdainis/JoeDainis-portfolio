@@ -343,7 +343,7 @@ Attaching package: 'dplyr'</code></pre>
 <pre><code>Warning: package 'ggplot2' was built under R version 4.4.3</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Make a plot of life expectancy versus infant mortality</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> africainfantmortal, <span class="fu">aes</span>(<span class="at">x =</span> life_expectancy, <span class="at">y =</span> infant_mortality)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> africainfantmortal, <span class="fu">aes</span>(<span class="at">x =</span> infant_mortality, <span class="at">y =</span> life_expectancy)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"green"</span>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Infant Mortality"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 226 rows containing missing values or values outside the scale range
 (`geom_point()`).</code></pre>
@@ -356,7 +356,7 @@ Attaching package: 'dplyr'</code></pre>
 </div>
 </div>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Make a plot of life expectancy versus population, with population on a log scale</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> africapop, <span class="fu">aes</span>(<span class="at">x =</span> life_expectancy, <span class="at">y =</span> population)) <span class="sc">+</span> <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">scale_y_log10</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> africapop, <span class="fu">aes</span>(<span class="at">x =</span> population, <span class="at">y =</span> life_expectancy)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"pink"</span>) <span class="sc">+</span> <span class="fu">scale_x_log10</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Population (log10)"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 51 rows containing missing values or values outside the scale range
 (`geom_point()`).</code></pre>
@@ -440,7 +440,7 @@ Attaching package: 'dplyr'</code></pre>
 <span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>africapop2000 <span class="ot">=</span> <span class="fu">select</span>(africa2000, <span class="fu">c</span>(<span class="st">'population'</span>,<span class="st">'life_expectancy'</span>))</span>
 <span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="do">##Make a plot of life expectancy versus infant mortality for 2000 Africa Data</span></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> africainfantmortal2000, <span class="fu">aes</span>(<span class="at">x =</span> life_expectancy, <span class="at">y =</span> infant_mortality)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> africainfantmortal2000, <span class="fu">aes</span>(<span class="at">x =</span> infant_mortality, <span class="at">y =</span> life_expectancy)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"dark green"</span>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Infant Mortality"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -449,7 +449,7 @@ Attaching package: 'dplyr'</code></pre>
 </div>
 </div>
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="do">##Make a plot of life expectancy versus population, with population on a log scale for 2000 Africa Data</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> africapop2000, <span class="fu">aes</span>(<span class="at">x =</span> life_expectancy, <span class="at">y =</span> population)) <span class="sc">+</span> <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">scale_y_log10</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> africapop2000, <span class="fu">aes</span>(<span class="at">x =</span> population, <span class="at">y =</span> life_expectancy)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span> <span class="fu">scale_x_log10</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Population (log10)"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
