@@ -13,7 +13,7 @@ website:
           - text: "Starter Analysis Exercise"
             file: starter-analysis-exercise/starter-analysis-exercise.qmd
           - text: "READY Exercise"
-            file: ready-exercise/ready-exercise.qmd
+            file: ready-exercise/ready-exercise.html
           - text: "Data Exercise"
             file: data-exercise/data-exercise.qmd
     right:
