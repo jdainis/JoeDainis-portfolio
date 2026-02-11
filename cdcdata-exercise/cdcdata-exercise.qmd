@@ -1,0 +1,139 @@
+---
+title: "Data Exercise"
+---
+```{r}
+#Data description
+
+#This data is a compilation of hesitancy rates for COVID-19 vaccinations across the 50 United States and the District of Columbia. This data was collected from a Household Pulse Survey (HPS) asking whether survey responders would take a vaccine. This data was then used to estimate predicted hesitancy rates using data from an American Community Survery (ACS) census bureau.
+
+#ensure packages are installed
+#load the necessary libraries
+library(dplyr)
+library(purrr)
+library(lubridate)
+library(ggplot2)
+library(readr)
+
+#Load the CSV file
+vaccdata <- read_csv("vaccine-hesitancy-COVID-19-20260210.csv")
+
+#Data Cleaning
+##Change column names
+colnames(vaccdata) <- c("FIPS_code", "county_name", "state", "estimated_hesitancy", "estimated_unsure", "estimated_strongly_hesitant", "SVI", "SVI_category", "CVAC", "CVAC_category", "percent_vaccinated_adults", "percent_Hispanic", "percent_AmericanIndianorNative", "percent_Asian", "percent_Black", "percent_NativeHawaiian", "percent_white", "geographical_point", "state_code", "county_boundary", "state_boundary")
+
+##Remove % from columns
+vaccdata$estimated_hesitancy <- as.numeric(gsub("%", "", vaccdata$estimated_hesitancy))
+
+vaccdata[, c("estimated hesitancy","estimated_unsure", "estimated_strongly_hesitant", "percent_vaccinated_adults", "percent_Hispanic", "percent_AmericanIndianorNative", "percent_Asian", "percent_Black", "percent_NativeHawaiian", "percent_white")] <- 
+  lapply(vaccdata[, c("estimated_hesitancy", "estimated_unsure", "estimated_strongly_hesitant", "percent_vaccinated_adults", "percent_Hispanic", "percent_AmericanIndianorNative", "percent_Asian", "percent_Black", "percent_NativeHawaiian", "percent_white")],
+         function(x) as.numeric(gsub("%", "", x)))
+
+#Summary of State
+##Generate frequency table for State Representation
+frequency_state <- table(vaccdata$state)
+
+##Make a barplot of the vaccine type data
+par(mar = c(7, 4, 4, 2))   
+#provides proper margins for bottom, left, top, right
+
+barplot(frequency_state,
+main="Frequency Plot of State in Vaccine Hesitancy Data",
+ylab="Frequency",
+col="orange",
+las=2,
+cex.names=0.6)
+
+#Summary of hesitancy status (hesitant, unsure, highly hesitant)
+##Make a histogram of estimated hesitancy rates to look for normal distribution
+ggplot(data = vaccdata, aes(x = estimated_hesitancy)) +
+  geom_histogram(fill = "black")
+
+##Summarize the hesitancy statistics
+summary(vaccdata$estimated_hesitancy)
+
+##Make a histogram of estimated unsure rates to look for normal distribution
+ggplot(data = vaccdata, aes(x = estimated_unsure)) +
+  geom_histogram(fill = "cyan")
+
+##Summarize the unsure statistics
+summary(vaccdata$estimated_unsure)
+
+##Make a histogram of estimated highly hesitant rates to look for normal distribution
+ggplot(data = vaccdata, aes(x = estimated_strongly_hesitant)) +
+  geom_histogram(fill = "pink")
+
+##Summarize the strongly hesitant statistics
+summary(vaccdata$estimated_strongly_hesitant)
+
+#Summary of SVI
+##SVI, also known as the Social Vulnerability Index, is a value representastive of how socially vulnerable a community is to disaster. On a scale of 0-1, a value closer to 1 signifies a great vulnerability to disaster.
+ggplot(data = vaccdata, aes(x = state, y = SVI)) +
+  geom_boxplot(fill = "blue") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+##Summarize the SVI statistics by state
+by(vaccdata$SVI, vaccdata$state, summary)
+
+#Summary of CVAC
+##CVAC, also known as the COVID-19 Vaccine Coverage Index, is a measure of how well a community could handle the consequences of a COVID-19 outbreak in their community. It takes a number of variables and circumstances into account, including health care access, affordable housing, etc. On a scale of 0-1, values closer to 1 mean the community is highly vulnerable to a COVID-19 outbreak.
+
+ggplot(data = vaccdata, aes(x = state, y = CVAC)) +
+  geom_boxplot(fill = "green") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+##Summarize the CVAC statistics by state
+by(vaccdata$CVAC, vaccdata$state, summary)
+
+#Percent Vaccinated Adults Variable Summary
+##Make a histogram of vaccination rates to look for normal distribution
+ggplot(data = vaccdata, aes(x = percent_vaccinated_adults)) +
+  geom_histogram(fill = "purple")
+
+##Summarize overall vaccine rates of adults
+summary(vaccdata$percent_vaccinated_adults)
+
+##Make a boxplot of vaccinated status of adults by state
+ggplot(data = vaccdata, aes(x = state, y = percent_vaccinated_adults)) +
+  geom_boxplot(fill = "purple") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+##Summarize the percent of vaccinated adults by state
+by(vaccdata$percent_vaccinated_adults, vaccdata$state, summary)
+
+#Percent Hispanic Variable Summary
+##Make a histogram of Hispanic demographic to look for normal distribution
+ggplot(data = vaccdata, aes(x = percent_Hispanic)) +
+  geom_histogram(fill = "yellow")
+
+##Summarize Hispanic presence in survey responders
+summary(vaccdata$percent_Hispanic)
+
+#Percent American Indian and/or Native American Variable Summary
+##Make a histogram of American Indian and/or Native American demographic to look for normal distribution
+ggplot(data = vaccdata, aes(x = percent_AmericanIndianorNative)) +
+  geom_histogram(fill = "gray")
+
+##Summarize American Indian and/or Native American presence in survey responders
+summary(vaccdata$percent_AmericanIndianorNative)
+
+#Percent Asian Variable Summary
+##Make a histogram of Asian demographic to look for normal distribution
+ggplot(data = vaccdata, aes(x = percent_Asian)) +
+  geom_histogram(fill = "lavender")
+
+##Summarize Asian presence in survey responders
+summary(vaccdata$percent_Asian)
+
+#Percent Black Variable Summary
+##Make a histogram of Black demographic to look for normal distribution
+ggplot(data = vaccdata, aes(x = percent_Black)) +
+  geom_histogram(fill = "orchid")
+
+##Summarize Black presence in survey responders
+summary(vaccdata$percent_Black)
+
+#Percent White Variable Summary
+##Make a histogram of White demographic to look for normal distribution
+ggplot(data = vaccdata, aes(x = percent_white)) +
+  geom_histogram(fill = "seagreen")
+
+##Summarize White presence in survey responders
+summary(vaccdata$percent_white)
+```
