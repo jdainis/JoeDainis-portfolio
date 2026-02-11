@@ -1,5 +1,5 @@
 ---
-title: "Data Exercise"
+title: "CDC Data Analysis Exercise"
 ---
 ```{r}
 #Data description
