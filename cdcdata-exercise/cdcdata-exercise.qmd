@@ -19,7 +19,7 @@ vaccdata <- read_csv("vaccine-hesitancy-COVID-19-20260210.csv")
 
 #Data Cleaning
 ##Change column names
-colnames(vaccdata) <- c("FIPS_code", "county_name", "state", "estimated_hesitancy", "estimated_unsure", "estimated_strongly_hesitant", "SVI", "SVI_category", "CVAC", "CVAC_category", "percent_vaccinated_adults", "percent_Hispanic", "percent_AmericanIndianorNative", "percent_Asian", "percent_Black", "percent_NativeHawaiian", "percent_white", "geographical_point", "state_code", "county_boundary", "state_boundary")
+colnames(vaccdata) <- c("FIPS_code", "county_name", "state", "estimated_hesitancy", "estimated_unsure", "estimated_strongly_hesitant", "SVI", "SVI_category", "CVAC", "CVAC_category", "percent_vaccinated_adults", "percent_Hispanic", "percent_AmericanIndianorNative", "percent_Asian", "percent_Black", "percent_NativeHawaiian", "percent_white")
 
 ##Remove % from columns
 vaccdata$estimated_hesitancy <- as.numeric(gsub("%", "", vaccdata$estimated_hesitancy))

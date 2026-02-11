@@ -239,12 +239,12 @@ Attaching package: 'lubridate'</code></pre>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Load the CSV file</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>vaccdata <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"vaccine-hesitancy-COVID-19-20260210.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Rows: 3142 Columns: 21</code></pre>
+<pre><code>Rows: 3142 Columns: 17</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
-chr (18): County Name, State, Estimated hesitant, Estimated hesitant or unsu...
+chr (14): County Name, State, Estimated hesitant, Estimated hesitant or unsu...
 dbl  (3): FIPS Code, Social Vulnerability Index (SVI), CVAC level of concern...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
@@ -252,7 +252,7 @@ dbl  (3): FIPS Code, Social Vulnerability Index (SVI), CVAC level of concern...
 </div>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Data Cleaning</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="do">##Change column names</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(vaccdata) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"FIPS_code"</span>, <span class="st">"county_name"</span>, <span class="st">"state"</span>, <span class="st">"estimated_hesitancy"</span>, <span class="st">"estimated_unsure"</span>, <span class="st">"estimated_strongly_hesitant"</span>, <span class="st">"SVI"</span>, <span class="st">"SVI_category"</span>, <span class="st">"CVAC"</span>, <span class="st">"CVAC_category"</span>, <span class="st">"percent_vaccinated_adults"</span>, <span class="st">"percent_Hispanic"</span>, <span class="st">"percent_AmericanIndianorNative"</span>, <span class="st">"percent_Asian"</span>, <span class="st">"percent_Black"</span>, <span class="st">"percent_NativeHawaiian"</span>, <span class="st">"percent_white"</span>, <span class="st">"geographical_point"</span>, <span class="st">"state_code"</span>, <span class="st">"county_boundary"</span>, <span class="st">"state_boundary"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(vaccdata) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"FIPS_code"</span>, <span class="st">"county_name"</span>, <span class="st">"state"</span>, <span class="st">"estimated_hesitancy"</span>, <span class="st">"estimated_unsure"</span>, <span class="st">"estimated_strongly_hesitant"</span>, <span class="st">"SVI"</span>, <span class="st">"SVI_category"</span>, <span class="st">"CVAC"</span>, <span class="st">"CVAC_category"</span>, <span class="st">"percent_vaccinated_adults"</span>, <span class="st">"percent_Hispanic"</span>, <span class="st">"percent_AmericanIndianorNative"</span>, <span class="st">"percent_Asian"</span>, <span class="st">"percent_Black"</span>, <span class="st">"percent_NativeHawaiian"</span>, <span class="st">"percent_white"</span>)</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="do">##Remove % from columns</span></span>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>vaccdata<span class="sc">$</span>estimated_hesitancy <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">"%"</span>, <span class="st">""</span>, vaccdata<span class="sc">$</span>estimated_hesitancy))</span>
