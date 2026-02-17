@@ -1,0 +1,558 @@
+---
+title: "NHL Data Presentation Exercise"
+---
+
+![First ChatGPT Prompt](FirstChatGPTPrompt.png)
+
+# ChatGPT's First Response:
+library(tidyverse)
+
+nhl <- read.csv("202122nhlteamdata.csv")
+
+head(nhl)
+
+nhl <- nhl %>%
+  rename(
+    xGF = xGoalsFor,
+    xGA = xGoalsAgainst
+  )
+
+avg_xGF <- mean(nhl$xGF, na.rm = TRUE)
+avg_xGA <- mean(nhl$xGA, na.rm = TRUE)
+
+library(ggplot2)
+
+p <- ggplot(nhl, aes(x = xGF, y = xGA)) +
+  geom_point(size = 3) +
+  
+  # Quadrant lines
+  geom_vline(xintercept = avg_xGF, size = 1) +
+  geom_hline(yintercept = avg_xGA, size = 1) +
+  
+  labs(
+    x = "xGoals For",
+    y = "xGoals Against"
+  ) +
+  theme_minimal()
+
+p
+
+install.packages("ggimage")
+library(ggimage)
+
+nhl$logo <- paste0("logos/", nhl$Team, ".png")
+
+ggplot(nhl, aes(x = xGF, y = xGA)) +
+  geom_image(aes(image = logo), size = 0.08) +
+  geom_vline(xintercept = avg_xGF, size = 1) +
+  geom_hline(yintercept = avg_xGA, size = 1) +
+  theme_minimal() +
+  labs(x = "xGoals For", y = "xGoals Against")
+
+ggplot(nhl, aes(x = xGF, y = xGA)) +
+  geom_image(aes(image = logo), size = 0.08) +
+  geom_vline(xintercept = avg_xGF, size = 1) +
+  geom_hline(yintercept = avg_xGA, size = 1) +
+  
+  annotate("text", x = min(nhl$xGF), y = max(nhl$xGA),
+           label = "Bad", hjust = 0, size = 8, fontface = "bold") +
+  
+  annotate("text", x = max(nhl$xGF), y = max(nhl$xGA),
+           label = "Fun", hjust = 1, size = 8, fontface = "bold") +
+  
+  annotate("text", x = min(nhl$xGF), y = min(nhl$xGA),
+           label = "Boring", hjust = 0, size = 8, fontface = "bold") +
+  
+  annotate("text", x = max(nhl$xGF), y = min(nhl$xGA),
+           label = "Good", hjust = 1, size = 8, fontface = "bold") +
+  
+  theme_minimal() +
+  labs(x = "xGoals For", y = "xGoals Against")
+
+# Chat GTP's Second Major Response
+I then went ahead and modified the code to select just filter for the "all" situation (this would include all xGoalsFor and xGoalsAgainst). I then was having big issues with the logos, as I didn't have all of the logos in a folder but didn't want to download all of them locally.
+
+## Second Prompt to ChatGPT
+I am getting an issue with the final plot trying to add the logos onto the figure:
+
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/ANA.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/BOS.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/BUF.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/CAR.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/CBJ.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/CGY.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/CHI.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/COL.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/DAL.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/DET.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/EDM.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/FLA.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/LAK.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/MIN.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/MTL.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/NJD.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/NSH.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/NYI.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/NYR.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/OTT.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/PHI.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/PIT.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/SEA.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/SJS.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/STL.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/TBL.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/TOR.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/UTA.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/VAN.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/VGK.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/WPG.png': No such file or directory @ error/blob.c/OpenBlob/2967
+Warning in value[[3L]](cond): Error in prepare_image: R: UnableToOpenBlob
+`logos/WSH.png': No such file or directory @ error/blob.c/OpenBlob/2967
+
+ChatGPT Response to Second Prompt:
+logo_lookup <- tibble(
+  team = c("ANA","ARI","BOS","BUF","CAR","CBJ","CGY","CHI","COL","DAL",
+           "DET","EDM","FLA","LAK","MIN","MTL","NJD","NSH","NYI","NYR",
+           "OTT","PHI","PIT","SEA","SJS","STL","TBL","TOR","UTA","VAN",
+           "VGK","WPG","WSH"),
+  logo = paste0("https://a.espncdn.com/i/teamlogos/nhl/500/", team, ".png")
+)
+
+nhl_5v5 <- nhl_5v5 %>%
+  left_join(logo_lookup, by = "team")
+library(ggimage)
+
+ggplot(nhl_5v5, aes(x = xGF, y = xGA)) +
+  geom_image(aes(image = logo), size = 0.07) +
+  geom_vline(xintercept = avg_xGF, size = 1) +
+  geom_hline(yintercept = avg_xGA, size = 1) +
+  theme_minimal(base_size = 18) +
+  labs(x = "xGoals For", y = "xGoals Against")
+
+# AI Third Response (Switch to Gemini)
+On the third major iteration of this interaction, I made some adjustments myself to the scales to match the scales seen in the original graph. I then realized I was getting an error for certain logos that looked like this: 
+
+Warning in value[[3L]](cond): Error in prepare_image: HTTP response code said error [a.espncdn.com]:
+
+The requested URL returned error: 404
+
+So I prompted Gemini with-
+Question: when running the following code, I get an error message that loads on my previewed website. Why?
+
+
+
+Warning in value[[3L]](cond): Error in prepare_image: HTTP response code said error [a.espncdn.com]:
+
+The requested URL returned error: 404
+
+Warning in value[[3L]](cond): Error in prepare_image: HTTP response code said error [a.espncdn.com]:
+
+The requested URL returned error: 404
+
+Warning in value[[3L]](cond): Error in prepare_image: HTTP response code said error [a.espncdn.com]:
+
+The requested URL returned error: 404
+
+
+
+nhl <- read.csv("202122nhlteamdata.csv")
+
+
+
+nhl_5v5 <- nhl %>%
+
+filter(situation == "all") %>%
+
+group_by(team) %>%
+
+summarise(
+
+xGF = xGoalsFor,
+
+xGA = xGoalsAgainst
+
+)
+
+avg_xGF <- mean(nhl_5v5$xGF)
+
+avg_xGA <- mean(nhl_5v5$xGA)
+
+logo_lookup <- tibble(
+
+team = c("ANA","ARI","BOS","BUF","CAR","CBJ","CGY","CHI","COL","DAL",
+
+"DET","EDM","FLA","LAK","MIN","MTL","NJD","NSH","NYI","NYR",
+
+"OTT","PHI","PIT","SEA","SJS","STL","TBL","TOR","UTA","VAN",
+
+"VGK","WPG","WSH"),
+
+logo = paste0("https://a.espncdn.com/i/teamlogos/nhl/500/", team, ".png")
+
+)
+
+nhl_5v5 <- nhl_5v5 %>%
+left_join(logo_lookup, by = "team")
+
+library(ggimage)
+
+## Back and Forth with Gemini
+Install if you haven't: install.packages("nhlplotR")
+library(nhlplotR)
+
+This replaces your logo_lookup and join steps
+nhl_5v5 <- nhl_5v5 %>%
+  mutate(team_abbr = team) # Ensure this matches NHL abbreviations
+
+However, when running this, I had issues with installing nhlplotR...
+
+Gemini Prompt:
+I keep getting this error even though I installed.packages nhlplotR
+
+Error in `library()`:
+
+! there is no package called 'nhlplotR'
+
+Backtrace:
+
+▆
+
+1. └─base::library(nhlplotR)
+
+Quitting from presentation-exercise.qmd:6-79 [unnamed-chunk-1]
+
+Execution halted
+
+Gemini gave me several solutions that did not work, including
+### Solution 1
+if (!require("nhlplotR")) install.packages("nhlplotR")
+library(nhlplotR)
+
+### Solution 2
+# You need the remotes package first
+if (!require("remotes")) install.packages("remotes")
+remotes::install_github("cassmbo/nhlplotR")
+
+### Solution 3
+install.packages("nhlplotR", repos = "https://cran.rstudio.com")
+# Do NOT use install.packages() here
+library(dplyr)
+library(tidyr)
+library(nhlplotR) # Just load it
+
+### Solutiuon 4
+install.packages("remotes")
+remotes::install_github("cassmbo/nhlplotR")
+library(nhlplotR)
+
+### Solution 5 (new repository path)
+# If you don't have remotes yet
+if (!require("remotes")) install.packages("remotes")
+
+# Install using the correct repository path
+remotes::install_github("m-m-m-m-b/nhlplotR")
+library(nhlplotR)
+
+### Solution 6
+remotes::install_github("nflverse/nhlplotR")
+
+This made all of the logos disappear now...
+
+### Solution 7
+# 1. Install 'devtools' if you don't have it
+if (!require("devtools")) install.packages("devtools")
+
+# 2. Force the installation from GitHub, skipping the version check
+devtools::install_github("nflverse/nhlplotR", upgrade = "never", force = TRUE)
+
+This back and forth went on for awhile trying different websites and packages that were like deleted, changed, removed, added permissions, etc. until we got to this solution:
+
+### Final Solution for Logos
+# Official NHL CDN Logo Lookup
+logo_lookup <- tibble(
+  team = c("ANA","ARI","BOS","BUF","CAR","CBJ","CGY","CHI","COL","DAL",
+           "DET","EDM","FLA","LAK","MIN","MTL","NJD","NSH","NYI","NYR",
+           "OTT","PHI","PIT","SEA","SJS","STL","TBL","TOR","VAN",
+           "VGK","WPG","WSH"),
+  # These are the current direct links from the NHL's official media server
+  logo = case_when(
+    team == "ANA" ~ "https://assets.nhle.com/logos/nhl/svg/ANA_light.svg",
+    team == "ARI" ~ "https://assets.nhle.com/logos/nhl/svg/ARI_light.svg",
+    team == "BOS" ~ "https://assets.nhle.com/logos/nhl/svg/BOS_light.svg",
+    team == "BUF" ~ "https://assets.nhle.com/logos/nhl/svg/BUF_light.svg",
+    team == "CAR" ~ "https://assets.nhle.com/logos/nhl/svg/CAR_light.svg",
+    team == "CBJ" ~ "https://assets.nhle.com/logos/nhl/svg/CBJ_light.svg",
+    team == "CGY" ~ "https://assets.nhle.com/logos/nhl/svg/CGY_light.svg",
+    team == "CHI" ~ "https://assets.nhle.com/logos/nhl/svg/CHI_light.svg",
+    team == "COL" ~ "https://assets.nhle.com/logos/nhl/svg/COL_light.svg",
+    team == "DAL" ~ "https://assets.nhle.com/logos/nhl/svg/DAL_light.svg",
+    team == "DET" ~ "https://assets.nhle.com/logos/nhl/svg/DET_light.svg",
+    team == "EDM" ~ "https://assets.nhle.com/logos/nhl/svg/EDM_light.svg",
+    team == "FLA" ~ "https://assets.nhle.com/logos/nhl/svg/FLA_light.svg",
+    team == "LAK" ~ "https://assets.nhle.com/logos/nhl/svg/LAK_light.svg",
+    team == "MIN" ~ "https://assets.nhle.com/logos/nhl/svg/MIN_light.svg",
+    team == "MTL" ~ "https://assets.nhle.com/logos/nhl/svg/MTL_light.svg",
+    team == "NJD" ~ "https://assets.nhle.com/logos/nhl/svg/NJD_light.svg",
+    team == "NSH" ~ "https://assets.nhle.com/logos/nhl/svg/NSH_light.svg",
+    team == "NYI" ~ "https://assets.nhle.com/logos/nhl/svg/NYI_light.svg",
+    team == "NYR" ~ "https://assets.nhle.com/logos/nhl/svg/NYR_light.svg",
+    team == "OTT" ~ "https://assets.nhle.com/logos/nhl/svg/OTT_light.svg",
+    team == "PHI" ~ "https://assets.nhle.com/logos/nhl/svg/PHI_light.svg",
+    team == "PIT" ~ "https://assets.nhle.com/logos/nhl/svg/PIT_light.svg",
+    team == "SEA" ~ "https://assets.nhle.com/logos/nhl/svg/SEA_light.svg",
+    team == "SJS" ~ "https://assets.nhle.com/logos/nhl/svg/SJS_light.svg",
+    team == "STL" ~ "https://assets.nhle.com/logos/nhl/svg/STL_light.svg",
+    team == "TBL" ~ "https://assets.nhle.com/logos/nhl/svg/TBL_light.svg",
+    team == "TOR" ~ "https://assets.nhle.com/logos/nhl/svg/TOR_light.svg",
+    team == "VAN" ~ "https://assets.nhle.com/logos/nhl/svg/VAN_light.svg",
+    team == "VGK" ~ "https://assets.nhle.com/logos/nhl/svg/VGK_light.svg",
+    team == "WPG" ~ "https://assets.nhle.com/logos/nhl/svg/WPG_light.svg",
+    team == "WSH" ~ "https://assets.nhle.com/logos/nhl/svg/WSH_light.svg"
+  )
+)
+
+```{r}
+#Data description and figure to re-create
+
+#This data is generated from the 2021-2022 NHL regular season from MoneyPuck, a publicly available reference for all sorts of hockey data. I want to re-create a graphic looking at xGoalsFor and xGoalsAgainst, which plots teams on whether they are simply good, bad, fun or boring based on the likelihood they will score a goal versus the likelihood they will give up a goal per game. I chose this season because this was the best regular season I have ever experienced as a Boston Bruins fan! (We ignore the post-season results...)
+
+#I prompted ChatGPT first and used Google Gemini to finish certain tidbits and it generated the following finalized code:
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+
+nhl <- read.csv("202122nhlteamdata.csv")
+
+nhl_5v5 <- nhl %>%
+  filter(situation == "all") %>%
+  group_by(team) %>%
+  summarise(
+    xGF = xGoalsFor,
+    xGA = xGoalsAgainst
+  )
+
+avg_xGF <- mean(nhl_5v5$xGF)
+avg_xGA <- mean(nhl_5v5$xGA)
+
+# Official NHL Logo CDN URLs (Transparent PNGs)
+# Official NHL CDN Logo Lookup
+logo_lookup <- tibble(
+  team = c("ANA","ARI","BOS","BUF","CAR","CBJ","CGY","CHI","COL","DAL",
+           "DET","EDM","FLA","LAK","MIN","MTL","NJD","NSH","NYI","NYR",
+           "OTT","PHI","PIT","SEA","SJS","STL","TBL","TOR","VAN",
+           "VGK","WPG","WSH"),
+  # These are the current direct links from the NHL's official media server
+  logo = case_when(
+    team == "ANA" ~ "https://assets.nhle.com/logos/nhl/svg/ANA_light.svg",
+    team == "ARI" ~ "https://assets.nhle.com/logos/nhl/svg/ARI_light.svg",
+    team == "BOS" ~ "https://assets.nhle.com/logos/nhl/svg/BOS_light.svg",
+    team == "BUF" ~ "https://assets.nhle.com/logos/nhl/svg/BUF_light.svg",
+    team == "CAR" ~ "https://assets.nhle.com/logos/nhl/svg/CAR_light.svg",
+    team == "CBJ" ~ "https://assets.nhle.com/logos/nhl/svg/CBJ_light.svg",
+    team == "CGY" ~ "https://assets.nhle.com/logos/nhl/svg/CGY_light.svg",
+    team == "CHI" ~ "https://assets.nhle.com/logos/nhl/svg/CHI_light.svg",
+    team == "COL" ~ "https://assets.nhle.com/logos/nhl/svg/COL_light.svg",
+    team == "DAL" ~ "https://assets.nhle.com/logos/nhl/svg/DAL_light.svg",
+    team == "DET" ~ "https://assets.nhle.com/logos/nhl/svg/DET_light.svg",
+    team == "EDM" ~ "https://assets.nhle.com/logos/nhl/svg/EDM_light.svg",
+    team == "FLA" ~ "https://assets.nhle.com/logos/nhl/svg/FLA_light.svg",
+    team == "LAK" ~ "https://assets.nhle.com/logos/nhl/svg/LAK_light.svg",
+    team == "MIN" ~ "https://assets.nhle.com/logos/nhl/svg/MIN_light.svg",
+    team == "MTL" ~ "https://assets.nhle.com/logos/nhl/svg/MTL_light.svg",
+    team == "NJD" ~ "https://assets.nhle.com/logos/nhl/svg/NJD_light.svg",
+    team == "NSH" ~ "https://assets.nhle.com/logos/nhl/svg/NSH_light.svg",
+    team == "NYI" ~ "https://assets.nhle.com/logos/nhl/svg/NYI_light.svg",
+    team == "NYR" ~ "https://assets.nhle.com/logos/nhl/svg/NYR_light.svg",
+    team == "OTT" ~ "https://assets.nhle.com/logos/nhl/svg/OTT_light.svg",
+    team == "PHI" ~ "https://assets.nhle.com/logos/nhl/svg/PHI_light.svg",
+    team == "PIT" ~ "https://assets.nhle.com/logos/nhl/svg/PIT_light.svg",
+    team == "SEA" ~ "https://assets.nhle.com/logos/nhl/svg/SEA_light.svg",
+    team == "SJS" ~ "https://assets.nhle.com/logos/nhl/svg/SJS_light.svg",
+    team == "STL" ~ "https://assets.nhle.com/logos/nhl/svg/STL_light.svg",
+    team == "TBL" ~ "https://assets.nhle.com/logos/nhl/svg/TBL_light.svg",
+    team == "TOR" ~ "https://assets.nhle.com/logos/nhl/svg/TOR_light.svg",
+    team == "VAN" ~ "https://assets.nhle.com/logos/nhl/svg/VAN_light.svg",
+    team == "VGK" ~ "https://assets.nhle.com/logos/nhl/svg/VGK_light.svg",
+    team == "WPG" ~ "https://assets.nhle.com/logos/nhl/svg/WPG_light.svg",
+    team == "WSH" ~ "https://assets.nhle.com/logos/nhl/svg/WSH_light.svg"
+  )
+)
+
+nhl_5v5 <- nhl_5v5 %>%
+  left_join(logo_lookup, by = "team")
+
+library(ggimage)
+
+#My AI Re-Created Plot
+ggplot(nhl_5v5, aes(x = xGF, y = xGA)) +
+  geom_image(aes(image = logo), size = 0.07) +
+  geom_vline(xintercept = avg_xGF, size = 1) +
+  geom_hline(yintercept = avg_xGA, size = 1) +
+  scale_x_continuous(
+    limits = c(200, 330),
+    breaks = seq(200, 330, by = 50)
+  ) +
+  scale_y_continuous(
+    limits = c(200, 330),
+    breaks = seq(200, 330, by = 10)
+  ) +
+  theme_minimal(base_size = 18) +
+  annotate("text",
+           x = 200,
+           y = 330,
+           label = "Bad",
+           hjust = 0,
+           size = 8,
+           fontface = "bold") +
+
+  annotate("text",
+           x = 330,
+           y = 330,
+           label = "Fun",
+           hjust = 1,
+           size = 8,
+           fontface = "bold") +
+
+  annotate("text",
+           x = 200,
+           y = 200,
+           label = "Boring",
+           hjust = 0,
+           size = 8,
+           fontface = "bold") +
+
+  annotate("text",
+           x = 330,
+           y = 200,
+           label = "Good",
+           hjust = 1,
+           size = 8,
+           fontface = "bold") +
+  labs(x = "xGoals For", y = "xGoals Against")
+```
+
+![Original Graph I attempted to re-create](202223NHLTeamsDataFigure.png)
+
+```{r}
+#This section was run with the help of Google AI Gemini, primarily in assistance with adding the highlighting of the rows.
+
+##Make the Table
+##Select columns of the dataset
+nhl_select <- select(nhl, "situation",  "xGoalsFor", "xGoalsAgainst", "shotsOnGoalFor", "shotsOnGoalAgainst")
+
+##Load necessary libraries
+library(dplyr)
+library(tidyr)
+library(gtsummary)
+library(gt)
+library(gtExtras)
+
+nhl_table <- nhl_select |>
+  gtsummary::tbl_summary(by = situation) |> ###Add italics labels for characteristics
+    modify_table_styling(
+    columns = label,
+    text_format = "italic"
+    ) |>
+  as_gt() |>
+  gt::tab_spanner(
+    label = "Man-Mismatch",
+    columns = c(stat_1, stat_2)
+  ) |>
+  gt::tab_spanner(
+    label = "Even-Strength",
+    columns = stat_3
+  ) |>
+   ###Change the colors of the column headings
+  gt::tab_style(
+    style = gt::cell_text(color = "blue"),
+    locations = gt::cells_column_labels(columns = "stat_1")
+  ) |>
+  gt::tab_style(
+    style = gt::cell_text(color = "green"),
+    locations = gt::cells_column_labels(columns = "stat_2")
+  ) |>
+  gt::tab_style(
+    style = gt::cell_text(color = "orange"),
+    locations = gt::cells_column_labels(columns = "stat_3")
+  ) |>
+  gt::tab_style(
+    style = gt::cell_text(color = "purple"),
+    locations = gt::cells_column_labels(columns = "stat_4")
+  )|>
+  gt::tab_style(
+    style = gt::cell_text(color = "red"),
+    locations = gt::cells_column_labels(columns = "stat_5")
+  )|> ###Add shading to the columns to match that of the column headers
+  gt::tab_style(
+    style = gt::cell_fill(color = "blue", alpha = 0.1),
+    locations = gt::cells_body(columns = stat_1)
+  ) |>
+  gt::tab_style(
+    style = gt::cell_fill(color = "green", alpha = 0.1),
+    locations = gt::cells_body(columns = stat_2)
+  ) |>
+  gt::tab_style(
+    style = gt::cell_fill(color = "orange", alpha = 0.1),
+    locations = gt::cells_body(columns = stat_3)
+  ) |>
+  gt::tab_style(
+    style = gt::cell_fill(color = "purple", alpha = 0.1),
+    locations = gt::cells_body(columns = stat_4)
+  ) |>
+  gt::tab_style(
+    style = gt::cell_fill(color = "red", alpha = 0.1),
+    locations = gt::cells_body(columns = stat_5)
+  )|> ###Add an interactive feature to highlight the row you are focusing on in yellow
+  gt::tab_options(
+    row.striping.include_table_body = TRUE,
+    row.striping.background_color = "#f9f9f9",
+    table.additional_css = "
+      tr:hover td { 
+        background-color: #ffffcc !important; 
+      }
+    "
+  ) |> ###Add a title
+    tab_header(
+    title = md("**NHL Team Performance by Game Situation**"),
+    subtitle = "Median Expected Goals and Shot Metrics with Quartiles (2021-22)"
+  ) |> ###Add a footnote to specify the year the data was collected from
+  gt::tab_footnote(
+    footnote = "Data collected from the 2021–22 NHL season.",
+    locations = gt::cells_column_labels(columns = starts_with("stat_"))
+  ) |> ###Add a caption that describes the data contained within the table
+  gt::tab_source_note(
+    source_note = gt::md("**Table Description** This table captures a summary of median statistics and quartiles for expected goals for/against and shot metrics for/against by different game situations, including shorthanded (4 on 5), powerplay (5 on 4), even-strength (5 on 5), all situation and other (4 on 4, 5 on 3, 3 on 5, etc.). Teams generate a large majority of their expected goals in 5-on-5 situations compared to special teams play due to the bulk of the game being played 5 on 5. In addition, teams generate more expected goals up a man than down a man on the ice and vice versa when down a man on the ice."))
+
+nhl_table
+```
