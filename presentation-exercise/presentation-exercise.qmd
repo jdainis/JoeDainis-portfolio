@@ -69,7 +69,7 @@ ggplot(nhl, aes(x = xGF, y = xGA)) +
   theme_minimal() +
   labs(x = "xGoals For", y = "xGoals Against")
 
-# Chat GTP's Second Major Response
+# Chat GTP's Second Major Response to Joe
 I then went ahead and modified the code to select just filter for the "all" situation (this would include all xGoalsFor and xGoalsAgainst). I then was having big issues with the logos, as I didn't have all of the logos in a folder but didn't want to download all of them locally.
 
 ## Second Prompt to ChatGPT
