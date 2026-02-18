@@ -2,7 +2,7 @@
 title: "NHL Data Presentation Exercise"
 ---
 
-![First ChatGPT Prompt](presentation-exercise/FirstChatGPTPrompt.png)
+![First ChatGPT Prompt](FirstChatGPTPrompt.png)
 
 # ChatGPT's First Response:
 library(tidyverse)
@@ -462,7 +462,7 @@ ggplot(nhl_5v5, aes(x = xGF, y = xGA)) +
   labs(x = "xGoals For", y = "xGoals Against")
 ```
 
-![Original Graph I attempted to re-create](presentation-exercise/202223NHLTeamsDataFigure.png)
+![Original Graph I attempted to re-create](202223NHLTeamsDataFigure.png)
 
 ```{r}
 #This section was run with the help of Google AI Gemini, primarily in assistance with adding the highlighting of the rows.
