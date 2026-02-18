@@ -1,6 +1,8 @@
-project: 
+project:
   type: website
   output-dir: docs
+  resources: 
+    - "presentation-exercise/*.png"  # This forces Quarto to copy all PNGs in that folder
 
 website:
   title: "My Portfoli-Joe: Joe Dainis's Portfolio"
