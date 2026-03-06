@@ -1,0 +1,329 @@
+---
+title: "Fitting Exercise Joe Dainis"
+---
+```{r}
+#ensure packages are installed
+#load the necessary libraries
+library(dplyr)
+library(purrr)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(gtsummary)
+
+#Load the data
+fittingdata <- read.csv("fittingexercisedata.csv")
+
+#Summarize the data
+summary(fittingdata)
+```
+```{r}
+#Plot DV as a function of time stratified by dose
+fittingdata %>%
+  filter(EVID == 0, MDV == 0) %>%
+  ggplot(aes(x = TIME,
+             y = DV,
+             group = ID)) +
+  geom_line(alpha = 0.6, color = "steelblue") +
+  geom_point(size = 1.5) +
+  facet_wrap(~ DOSE) +
+  labs(
+    x = "Time",
+    y = "DV"
+  ) +
+  theme_bw()
+```
+
+### Conclusion: The three doses of mavoglurant appear to have similar trends of DV over time.
+
+```{r}
+#Keep only entries where patients received one dose
+fittingdata_occ1 <- fittingdata %>%
+  filter(OCC == 1)
+
+#sumamrize data where patients only received one dose
+summary(fittingdata_occ1)
+
+#Compute the sum of DV for each individual after excluding observations where TIME = 0
+sum_fittingdata <- fittingdata_occ1 %>%
+  filter(TIME != 0) %>%
+  group_by(ID) %>%
+  summarize(
+    Y = sum(DV, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+#Make a dataframe which only contains data where TIME = 0
+time0_fittingdata <- fittingdata_occ1 %>%
+  filter(TIME == 0)
+
+#Combine the two dataframes using the left_join() function
+final_fittingdata <- time0_fittingdata %>%
+  left_join(sum_fittingdata, by = "ID")
+
+#summarize combined data table
+summary(final_fittingdata)
+
+#Clean the data to convert RACE and SEX to factor variables keeps the following variables: Y, DOSE, AGE, SEX, RACE, WT, HT
+analysis_fittingdata <- final_fittingdata %>%
+  mutate(
+    RACE = factor(RACE),
+    SEX  = factor(SEX)
+  ) %>%
+  select(Y, DOSE, AGE, SEX, RACE, WT, HT)
+
+#generate a summary table for the data, including mean and standard deviation of the weight, height, age, and Y variable and splits of how many were in each dose, sex and race group
+analysis_fittingdata %>%
+  tbl_summary(
+    statistic = list(
+      all_continuous() ~ "{mean} ({sd})",
+      all_categorical() ~ "{n} / {N} ({p}%)"
+    )
+  )
+```
+
+### Conclusion: This table shows that many of the participants in the study received either a dose of 25 or 50, with a smaller representation for the medium dosage. There also appears to be a major skew towards one sex, and a large skew towards one race.
+
+```{r}
+#summarize the data by the three dosage groups
+analysis_fittingdata %>%
+  group_by(DOSE) %>%
+  summarise(
+    n = n(),
+    mean_Y = mean(Y),
+    sd_Y = sd(Y),
+    median_Y = median(Y),
+    min_Y = min(Y),
+    max_Y = max(Y)
+  )
+
+#Generate preliminary relationship graphs between-
+##Age and Y
+ggplot(analysis_fittingdata, aes(AGE, Y)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_bw()
+```
+
+### Conclusion: No correlation between Age and Outcome
+```{r}
+##Weight and Y
+ggplot(analysis_fittingdata, aes(WT, Y)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_bw()
+```
+
+### Conclusion: Slight negative correlation between Weight and Outcome
+```{r}
+##Height and Y
+ggplot(analysis_fittingdata, aes(HT, Y)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_bw()
+```
+
+### Conclusion: Slight negative correlation between Height and Outcome
+
+```{r}
+##Sex and Y
+ggplot(analysis_fittingdata, aes(SEX, Y)) +
+  geom_boxplot() +
+  theme_bw()
+```
+
+### Conclusion: No difference noted between Sex and Outcome
+```{r}
+##Race and Y
+ggplot(analysis_fittingdata, aes(RACE, Y)) +
+  geom_boxplot() +
+  theme_bw()
+```
+
+### Conclusion: No difference noted between Race and Outcome
+```{r}
+##Dose and Y
+ggplot(analysis_fittingdata, aes(factor(DOSE), Y)) +
+  geom_boxplot() +
+  theme_bw()
+```
+
+### Conclusion: An increasing dose dramatically correlates with an increase in Outcome Y
+```{r}
+#Plot the distributions of the variables
+
+##Histogram of the outcome, Y, to see distribution of outcome in the data
+ggplot(analysis_fittingdata, aes(Y)) +
+  geom_histogram(bins = 30) +
+  theme_bw()
+
+ggplot(analysis_fittingdata, aes(Y)) +
+  geom_density() +
+  theme_bw()
+```
+
+### Conclusion: Left skew to the distribution, with greater representation of Y outcomes smaller than 3000.
+```{r}
+##Distribution of age in the dataset
+ggplot(analysis_fittingdata, aes(AGE)) +
+  geom_histogram(bins = 20) +
+  theme_bw()
+```
+
+### Conclusion: Possibly bimodal distribution due to the two peaks in ages seen
+```{r}
+##Distribution of weight in the dataset
+ggplot(analysis_fittingdata, aes(WT)) +
+  geom_histogram(bins = 20) +
+  theme_bw()
+```
+
+### Conclusion: Normal Distribution of weight
+```{r}
+##Distribution of height in the dataset
+ggplot(analysis_fittingdata, aes(HT)) +
+  geom_histogram(bins = 20) +
+  theme_bw()
+```
+
+### Conclusion: Normal Distribution of height
+```{r}
+#Generate some correlation/pair plots to see correlations in the data
+##Make a visual correlation plot
+###Load the corrplot library
+library(corrplot)
+
+cor_fittingdata <- analysis_fittingdata %>%
+  select(Y, DOSE, AGE, WT, HT) %>%
+  cor()
+
+corrplot(cor_fittingdata, method = "color")
+
+##Make a pair plot
+###Load the corrplot library
+library(GGally)
+
+analysis_fittingdata %>%
+  select(Y, DOSE, AGE, WT, HT) %>%
+  ggpairs()
+```
+
+# Main Takeaways
+1. There appears to be a significant correlation between the dose of mavoglurant and the pharmokinetic Y outcome, which implies that the drug is having some sort of effect on the outcome.
+2. There also appears to be a slight correlation between weight and Y outcome, with higher weights correlating with a smaller Y.
+3. The distribution of Y outcome values is slightly skewed to the left, with a slightly higher representation of smaller Y values than larger Y values. A majority of the Y values are smaller than 3000.
+
+## Run Linear Models
+```{r}
+#Load necessary libraries
+library(yardstick)
+library(pROC)
+
+#Fit a linear model and use the DOSE variable to predict the Y outcome variable
+
+##Run the linear model
+lm_dose <- lm(Y ~ DOSE, data = analysis_fittingdata)
+
+##Predict the outcome based on the dose
+pred_lm_dose <- analysis_fittingdata %>%
+  mutate(pred = predict(lm_dose, newdata = analysis_fittingdata))
+
+##Run the metrics to see how well the model fit
+rmse_lm_dose <- rmse(pred_lm_dose, truth = Y, estimate = pred)
+rsq_lm_dose  <- rsq(pred_lm_dose, truth = Y, estimate = pred)
+
+#Display the RMSE and RSQ metrics
+print(rmse_lm_dose)
+print(rsq_lm_dose)
+```
+
+### Conclusion: The linear model using DOSE as a predictor of the outcome is weak but not unusable.
+
+```{r}
+#Fit a linear model and use all variables to predict the Y outcome variable
+
+##Run the linear model using all variables
+lm_all <- lm(Y ~ DOSE + AGE + SEX + RACE + WT + HT, data = analysis_fittingdata)
+
+##Predict the outcome based on all variables
+pred_lm_all <- analysis_fittingdata %>%
+  mutate(pred = predict(lm_all, newdata = analysis_fittingdata))
+
+##Run the metrics to see how well the model fit
+rmse_lm_all <- rmse(pred_lm_all, truth = Y, estimate = pred)
+rsq_lm_all  <- rsq(pred_lm_all, truth = Y, estimate = pred)
+
+#Display the RMSE and RSQ metrics
+print(rmse_lm_all)
+print(rsq_lm_all)
+```
+
+### Conclusion: The linear model using all variables as a predictor of the outcome is weak but not unusable.
+
+```{r}
+#Fit a logsitic model and use DOSE to predict the SEX variable
+
+##Run the logsitic model using the SEX and DOSE variables
+logit_dose <- glm(SEX ~ DOSE,
+                  data = analysis_fittingdata,
+                  family = binomial)
+
+##Predict the outcome based on the DOSE variable
+pred_logit_dose <- analysis_fittingdata %>%
+  mutate(
+    prob = predict(logit_dose, type = "response"),
+    pred_class = factor(ifelse(prob > 0.5, 1, 0),
+                        levels = levels(SEX))
+  )
+
+##Generate the accuracy metrics to see how well the model fit
+acc_logit_dose <- accuracy(pred_logit_dose,
+                           truth = SEX,
+                           estimate = pred_class)
+
+print(acc_logit_dose)
+
+##Generate the ROC metrics to see how well the model fit
+roc_dose <- roc(analysis_fittingdata$SEX, pred_logit_dose$prob)
+print(auc(roc_dose))
+```
+
+### Conclusion: The logsitic model using DOSE as a predictor of SEX is not usable.
+
+```{r}
+#Fit a logsitic model and use all variables to predict the SEX variable
+
+##Run the logsitic model using the SEX and DOSE variables
+logit_all <- glm(SEX ~ DOSE + AGE + RACE + WT + HT,
+                  data = analysis_fittingdata,
+                  family = binomial)
+
+##Predict the outcome based on the DOSE variable
+pred_logit_all <- analysis_fittingdata %>%
+  mutate(
+    prob = predict(logit_all, type = "response"),
+    pred_class = factor(ifelse(prob > 0.5, 1, 0),
+                        levels = levels(SEX))
+  )
+
+##Generate the accuracy metrics to see how well the model fit
+acc_logit_all <- accuracy(pred_logit_all,
+                           truth = SEX,
+                           estimate = pred_class)
+
+print(acc_logit_all)
+
+##Generate the ROC metrics to see how well the model fit
+roc_all <- roc(analysis_fittingdata$SEX, pred_logit_all$prob)
+print(auc(roc_all))
+```
+
+### Conclusion: The logsitic model using all variables as a predictor of SEX is not usable.
+
+# What Does This All Mean?
+
+1. The first conclusion we can come to is that using DOSE as a predictor of the Y outcome variable is quite weak. Our RMSE metric was 666 and the R-squared was 0.516, indicating that the model is not total and utter garbage, but that using dose alone to predict the outcome is not reliable.
+2. We see that including all of the variables into the linear regression model improved the metrics (smaller RMSE to 591, larger R-squared to 0.619), but still, all of the variables are not enough to strongly predict the outcome. This matches what I would expect with complicated drug data, with many variables likely impacting the outcome. This could also indicate trialing out higher doses (if possible) to see if this predictive value could get any stronger.
+3. SEX is a categorical variable that cannot be predicted by these variables (which we knew coming into this analysis).

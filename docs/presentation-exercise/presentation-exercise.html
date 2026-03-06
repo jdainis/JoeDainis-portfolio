@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.27">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -67,14 +67,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="quarto:offset" content="../">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -117,7 +118,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -181,6 +182,10 @@ window.Quarto = {
         <li>
     <a class="dropdown-item" href="../presentation-exercise/presentation-exercise.html">
  <span class="dropdown-text">Presentation NHL Data Exercise</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../fitting-exercise/fitting-exercise.html">
+ <span class="dropdown-text">Fitting Exercise</span></a>
   </li>  
     </ul>
   </li>
@@ -365,12 +370,12 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
 <h1>Official NHL CDN Logo Lookup</h1>
 <p>logo_lookup &lt;- tibble( team = c(“ANA”,“ARI”,“BOS”,“BUF”,“CAR”,“CBJ”,“CGY”,“CHI”,“COL”,“DAL”, “DET”,“EDM”,“FLA”,“LAK”,“MIN”,“MTL”,“NJD”,“NSH”,“NYI”,“NYR”, “OTT”,“PHI”,“PIT”,“SEA”,“SJS”,“STL”,“TBL”,“TOR”,“VAN”, “VGK”,“WPG”,“WSH”), # These are the current direct links from the NHL’s official media server logo = case_when( team == “ANA” ~ “https://assets.nhle.com/logos/nhl/svg/ANA_light.svg”, team == “ARI” ~ “https://assets.nhle.com/logos/nhl/svg/ARI_light.svg”, team == “BOS” ~ “https://assets.nhle.com/logos/nhl/svg/BOS_light.svg”, team == “BUF” ~ “https://assets.nhle.com/logos/nhl/svg/BUF_light.svg”, team == “CAR” ~ “https://assets.nhle.com/logos/nhl/svg/CAR_light.svg”, team == “CBJ” ~ “https://assets.nhle.com/logos/nhl/svg/CBJ_light.svg”, team == “CGY” ~ “https://assets.nhle.com/logos/nhl/svg/CGY_light.svg”, team == “CHI” ~ “https://assets.nhle.com/logos/nhl/svg/CHI_light.svg”, team == “COL” ~ “https://assets.nhle.com/logos/nhl/svg/COL_light.svg”, team == “DAL” ~ “https://assets.nhle.com/logos/nhl/svg/DAL_light.svg”, team == “DET” ~ “https://assets.nhle.com/logos/nhl/svg/DET_light.svg”, team == “EDM” ~ “https://assets.nhle.com/logos/nhl/svg/EDM_light.svg”, team == “FLA” ~ “https://assets.nhle.com/logos/nhl/svg/FLA_light.svg”, team == “LAK” ~ “https://assets.nhle.com/logos/nhl/svg/LAK_light.svg”, team == “MIN” ~ “https://assets.nhle.com/logos/nhl/svg/MIN_light.svg”, team == “MTL” ~ “https://assets.nhle.com/logos/nhl/svg/MTL_light.svg”, team == “NJD” ~ “https://assets.nhle.com/logos/nhl/svg/NJD_light.svg”, team == “NSH” ~ “https://assets.nhle.com/logos/nhl/svg/NSH_light.svg”, team == “NYI” ~ “https://assets.nhle.com/logos/nhl/svg/NYI_light.svg”, team == “NYR” ~ “https://assets.nhle.com/logos/nhl/svg/NYR_light.svg”, team == “OTT” ~ “https://assets.nhle.com/logos/nhl/svg/OTT_light.svg”, team == “PHI” ~ “https://assets.nhle.com/logos/nhl/svg/PHI_light.svg”, team == “PIT” ~ “https://assets.nhle.com/logos/nhl/svg/PIT_light.svg”, team == “SEA” ~ “https://assets.nhle.com/logos/nhl/svg/SEA_light.svg”, team == “SJS” ~ “https://assets.nhle.com/logos/nhl/svg/SJS_light.svg”, team == “STL” ~ “https://assets.nhle.com/logos/nhl/svg/STL_light.svg”, team == “TBL” ~ “https://assets.nhle.com/logos/nhl/svg/TBL_light.svg”, team == “TOR” ~ “https://assets.nhle.com/logos/nhl/svg/TOR_light.svg”, team == “VAN” ~ “https://assets.nhle.com/logos/nhl/svg/VAN_light.svg”, team == “VGK” ~ “https://assets.nhle.com/logos/nhl/svg/VGK_light.svg”, team == “WPG” ~ “https://assets.nhle.com/logos/nhl/svg/WPG_light.svg”, team == “WSH” ~ “https://assets.nhle.com/logos/nhl/svg/WSH_light.svg” ) )</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Data description and figure to re-create</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Data description and figure to re-create</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#This data is generated from the 2021-2022 NHL regular season from MoneyPuck, a publicly available reference for all sorts of hockey data. I want to re-create a graphic looking at xGoalsFor and xGoalsAgainst, which plots teams on whether they are simply good, bad, fun or boring based on the likelihood they will score a goal versus the likelihood they will give up a goal per game. I chose this season because this was the best regular season I have ever experienced as a Boston Bruins fan! (We ignore the post-season results...)</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#I prompted ChatGPT first and used Google Gemini to finish certain tidbits and it generated the following finalized code:</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'ggplot2' was built under R version 4.4.3</code></pre>
 </div>
@@ -398,7 +403,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>nhl <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"202122nhlteamdata.csv"</span>)</span>
@@ -461,11 +466,11 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
 <span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>nhl_5v5 <span class="ot">&lt;-</span> nhl_5v5 <span class="sc">%&gt;%</span></span>
 <span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(logo_lookup, <span class="at">by =</span> <span class="st">"team"</span>)</span>
 <span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggimage)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggimage)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'ggimage' was built under R version 4.4.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#My AI Re-Created Plot</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#My AI Re-Created Plot</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(nhl_5v5, <span class="fu">aes</span>(<span class="at">x =</span> xGF, <span class="at">y =</span> xGA)) <span class="sc">+</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_image</span>(<span class="fu">aes</span>(<span class="at">image =</span> logo), <span class="at">size =</span> <span class="fl">0.07</span>) <span class="sc">+</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> avg_xGF, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
@@ -510,7 +515,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
 <span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="dv">1</span>,</span>
 <span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>           <span class="at">size =</span> <span class="dv">8</span>,</span>
 <span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>           <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"xGoals For"</span>, <span class="at">y =</span> <span class="st">"xGoals Against"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"xGoals For"</span>, <span class="at">y =</span> <span class="st">"xGoals Against"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ℹ Please use `linewidth` instead.</code></pre>
@@ -530,7 +535,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
 </figure>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#This section was run with the help of Google AI Gemini, primarily in assistance with adding the highlighting of the rows.</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#This section was run with the help of Google AI Gemini, primarily in assistance with adding the highlighting of the rows.</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="do">##Make the Table</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="do">##Select columns of the dataset</span></span>
@@ -539,19 +544,19 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="do">##Load necessary libraries</span></span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'gtsummary' was built under R version 4.4.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'gt' was built under R version 4.4.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtExtras)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtExtras)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'gtExtras' was built under R version 4.4.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>nhl_table <span class="ot">&lt;-</span> nhl_select <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>nhl_table <span class="ot">&lt;-</span> nhl_select <span class="sc">|&gt;</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(<span class="at">by =</span> situation) <span class="sc">|&gt;</span> <span class="do">###Add italics labels for characteristics</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">modify_table_styling</span>(</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> label,</span>
@@ -627,25 +632,25 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
 <span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_source_note</span>(</span>
 <span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">source_note =</span> gt<span class="sc">::</span><span class="fu">md</span>(<span class="st">"**Table Description** This table captures a summary of median statistics and quartiles for expected goals for/against and shot metrics for/against by different game situations, including shorthanded (4 on 5), powerplay (5 on 4), even-strength (5 on 5), all situation and other (4 on 4, 5 on 3, 3 on 5, etc.). Teams generate a large majority of their expected goals in 5-on-5 situations compared to special teams play due to the bulk of the game being played 5 on 5. In addition, teams generate more expected goals up a man than down a man on the ice and vice versa when down a man on the ice."</span>))</span>
 <span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>nhl_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>nhl_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="zxknvshrjz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#zxknvshrjz table {
+<div id="zbqsjulhkk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#zbqsjulhkk table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#zxknvshrjz thead, #zxknvshrjz tbody, #zxknvshrjz tfoot, #zxknvshrjz tr, #zxknvshrjz td, #zxknvshrjz th {
+#zbqsjulhkk thead, #zbqsjulhkk tbody, #zbqsjulhkk tfoot, #zbqsjulhkk tr, #zbqsjulhkk td, #zbqsjulhkk th {
   border-style: none;
 }
 
-#zxknvshrjz p {
+#zbqsjulhkk p {
   margin: 0;
   padding: 0;
 }
 
-#zxknvshrjz .gt_table {
+#zbqsjulhkk .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -671,12 +676,12 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-left-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_caption {
+#zbqsjulhkk .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#zxknvshrjz .gt_title {
+#zbqsjulhkk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -688,7 +693,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-bottom-width: 0;
 }
 
-#zxknvshrjz .gt_subtitle {
+#zbqsjulhkk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -700,7 +705,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-top-width: 0;
 }
 
-#zxknvshrjz .gt_heading {
+#zbqsjulhkk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -712,13 +717,13 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-right-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_bottom_border {
+#zbqsjulhkk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_col_headings {
+#zbqsjulhkk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -733,7 +738,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-right-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_col_heading {
+#zbqsjulhkk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -753,7 +758,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   overflow-x: hidden;
 }
 
-#zxknvshrjz .gt_column_spanner_outer {
+#zbqsjulhkk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -765,15 +770,15 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   padding-right: 4px;
 }
 
-#zxknvshrjz .gt_column_spanner_outer:first-child {
+#zbqsjulhkk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zxknvshrjz .gt_column_spanner_outer:last-child {
+#zbqsjulhkk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zxknvshrjz .gt_column_spanner {
+#zbqsjulhkk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -785,11 +790,11 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   width: 100%;
 }
 
-#zxknvshrjz .gt_spanner_row {
+#zbqsjulhkk .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#zxknvshrjz .gt_group_heading {
+#zbqsjulhkk .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -815,7 +820,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   text-align: left;
 }
 
-#zxknvshrjz .gt_empty_group_heading {
+#zbqsjulhkk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -830,15 +835,15 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   vertical-align: middle;
 }
 
-#zxknvshrjz .gt_from_md > :first-child {
+#zbqsjulhkk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zxknvshrjz .gt_from_md > :last-child {
+#zbqsjulhkk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zxknvshrjz .gt_row {
+#zbqsjulhkk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -857,7 +862,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   overflow-x: hidden;
 }
 
-#zxknvshrjz .gt_stub {
+#zbqsjulhkk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -870,7 +875,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   padding-right: 5px;
 }
 
-#zxknvshrjz .gt_stub_row_group {
+#zbqsjulhkk .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -884,15 +889,15 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   vertical-align: top;
 }
 
-#zxknvshrjz .gt_row_group_first td {
+#zbqsjulhkk .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#zxknvshrjz .gt_row_group_first th {
+#zbqsjulhkk .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#zxknvshrjz .gt_summary_row {
+#zbqsjulhkk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -902,16 +907,16 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   padding-right: 5px;
 }
 
-#zxknvshrjz .gt_first_summary_row {
+#zbqsjulhkk .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_first_summary_row.thick {
+#zbqsjulhkk .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#zxknvshrjz .gt_last_summary_row {
+#zbqsjulhkk .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -921,7 +926,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-bottom-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_grand_summary_row {
+#zbqsjulhkk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -931,7 +936,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   padding-right: 5px;
 }
 
-#zxknvshrjz .gt_first_grand_summary_row {
+#zbqsjulhkk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -941,7 +946,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-top-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_last_grand_summary_row_top {
+#zbqsjulhkk .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -951,11 +956,11 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-bottom-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_striped {
+#zbqsjulhkk .gt_striped {
   background-color: #F9F9F9;
 }
 
-#zxknvshrjz .gt_table_body {
+#zbqsjulhkk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -964,7 +969,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-bottom-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_footnotes {
+#zbqsjulhkk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -978,7 +983,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-right-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_footnote {
+#zbqsjulhkk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -987,7 +992,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   padding-right: 5px;
 }
 
-#zxknvshrjz .gt_sourcenotes {
+#zbqsjulhkk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1001,7 +1006,7 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   border-right-color: #D3D3D3;
 }
 
-#zxknvshrjz .gt_sourcenote {
+#zbqsjulhkk .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1009,72 +1014,72 @@ avg_xGA &lt;- mean(nhl\)</span>xGA, na.rm = TRUE)</p>
   padding-right: 5px;
 }
 
-#zxknvshrjz .gt_left {
+#zbqsjulhkk .gt_left {
   text-align: left;
 }
 
-#zxknvshrjz .gt_center {
+#zbqsjulhkk .gt_center {
   text-align: center;
 }
 
-#zxknvshrjz .gt_right {
+#zbqsjulhkk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zxknvshrjz .gt_font_normal {
+#zbqsjulhkk .gt_font_normal {
   font-weight: normal;
 }
 
-#zxknvshrjz .gt_font_bold {
+#zbqsjulhkk .gt_font_bold {
   font-weight: bold;
 }
 
-#zxknvshrjz .gt_font_italic {
+#zbqsjulhkk .gt_font_italic {
   font-style: italic;
 }
 
-#zxknvshrjz .gt_super {
+#zbqsjulhkk .gt_super {
   font-size: 65%;
 }
 
-#zxknvshrjz .gt_footnote_marks {
+#zbqsjulhkk .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#zxknvshrjz .gt_asterisk {
+#zbqsjulhkk .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#zxknvshrjz .gt_indent_1 {
+#zbqsjulhkk .gt_indent_1 {
   text-indent: 5px;
 }
 
-#zxknvshrjz .gt_indent_2 {
+#zbqsjulhkk .gt_indent_2 {
   text-indent: 10px;
 }
 
-#zxknvshrjz .gt_indent_3 {
+#zbqsjulhkk .gt_indent_3 {
   text-indent: 15px;
 }
 
-#zxknvshrjz .gt_indent_4 {
+#zbqsjulhkk .gt_indent_4 {
   text-indent: 20px;
 }
 
-#zxknvshrjz .gt_indent_5 {
+#zbqsjulhkk .gt_indent_5 {
   text-indent: 25px;
 }
 
-#zxknvshrjz .katex-display {
+#zbqsjulhkk .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#zxknvshrjz div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#zbqsjulhkk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 
@@ -1083,7 +1088,7 @@ tr:hover td {
 }
 </style>
 
-<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
 <colgroup>
 <col style="width: 16%">
 <col style="width: 16%">
@@ -1094,10 +1099,10 @@ tr:hover td {
 </colgroup>
 <thead>
 <tr class="gt_heading header">
-<th colspan="6" class="gt_heading gt_title gt_font_normal"><strong>NHL Team Performance by Game Situation</strong></th>
+<td colspan="6" class="gt_heading gt_title gt_font_normal"><strong>NHL Team Performance by Game Situation</strong></td>
 </tr>
 <tr class="gt_heading even">
-<th colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Median Expected Goals and Shot Metrics with Quartiles (2021-22)</th>
+<td colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Median Expected Goals and Shot Metrics with Quartiles (2021-22)</td>
 </tr>
 <tr class="gt_col_headings gt_spanner_row header">
 <th rowspan="2" id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
@@ -1227,13 +1232,14 @@ N = 32<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
