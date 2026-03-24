@@ -14,7 +14,7 @@ library(tidyr)
 library(gtsummary)
 
 #Load the data
-fittingdata <- read.csv("fittingexercisedata.csv")
+fittingdata <- read.csv("fitting-exercise/fittingexercisedata.csv")
 
 #Summarize the data
 summary(fittingdata)
@@ -327,3 +327,168 @@ print(auc(roc_all))
 1. The first conclusion we can come to is that using DOSE as a predictor of the Y outcome variable is quite weak. Our RMSE metric was 666 and the R-squared was 0.516, indicating that the model is not total and utter garbage, but that using dose alone to predict the outcome is not reliable.
 2. We see that including all of the variables into the linear regression model improved the metrics (smaller RMSE to 591, larger R-squared to 0.619), but still, all of the variables are not enough to strongly predict the outcome. This matches what I would expect with complicated drug data, with many variables likely impacting the outcome. This could also indicate trialing out higher doses (if possible) to see if this predictive value could get any stronger.
 3. SEX is a categorical variable that cannot be predicted by these variables (which we knew coming into this analysis).
+
+# Module 10: Model Improvement
+
+## Subset Fitting Dataset and Make Training/Testing Datasets
+```{r}
+#Load libraries
+library(tidymodels)
+
+#Subset data to remove RACE variable and keep 6 other variables
+subset_fittingdata <- analysis_fittingdata %>%
+  select(Y, DOSE, AGE, SEX, WT, HT)
+
+#Set seed for reproducibility
+set.seed(1234)
+
+#Split the data so that 75% is for the training dataset and 25% is for the testing dataset
+subset_fittingdata_split <- initial_split(subset_fittingdata, prop = 0.75)
+
+##Make training dataset
+fittingdata_training <- training(subset_fittingdata_split)
+
+##Make testing dataset
+fittingdata_testing <- testing(subset_fittingdata_split)
+```
+
+## Fit Linear Models to the training data
+```{r}
+#Model 1: Fit a linear model to predict the outcome variable Y using the DOSE variable as the predictor
+##Set engine to a linear model
+lm_model <- linear_reg() %>%
+  set_engine("lm")
+
+##Run linear model using DOSE as a predictor of Y outcome
+model_dose <- workflow() %>%
+  add_model(lm_model) %>%
+  add_formula(Y ~ DOSE)
+
+##Fit linear model of dose to the training data
+fit_dose <- fit(model_dose, data = fittingdata_training)
+
+#Model 2: Fit a linear model for Y but this time use all variables as the predictor
+
+##Run linear model using All Variables as a predictor of Y outcome
+model_all <- workflow() %>%
+  add_model(lm_model) %>%
+  add_formula(Y ~ DOSE + AGE + SEX + WT + HT)
+
+##Fit linear model of all variables to the training data
+fit_all <- fit(model_all, data = fittingdata_training)
+```
+
+## Model Performance Assessment 1
+```{r}
+#Compute Predictions for the two models
+##Dose Linear Model Prediction
+pred_dose <- predict(fit_dose, fittingdata_training) %>%
+  bind_cols(fittingdata_training)
+
+##All Variables Linear Model Prediction
+pred_all <- predict(fit_all, fittingdata_training) %>%
+  bind_cols(fittingdata_training)
+
+#Computer RMSE for the two models
+##RMSE for Dose Linear Model;
+rmse_dose <- rmse(pred_dose, truth = Y, estimate = .pred)
+
+##RMSE for All Variables Linear Model
+rmse_all  <- rmse(pred_all, truth = Y, estimate = .pred)
+
+print(rmse_dose)
+print(rmse_all) 
+
+#Compute the RMSE of a Null Model
+##Calculate the mean of the Y variable from the fitting data
+mean_y <- mean(fittingdata_training$Y)
+
+##Calculate the RMSE for the Null Model
+rmse_null <- sqrt(mean((fittingdata_training$Y - mean_y)^2))
+print(rmse_null)
+```
+
+## Conclusions and Comparisons of the Models using Model Assessment 1
+The RMSE values predicted/calculated for the models are as follows:
+Null Model: 948.3526
+Dose Model: 703
+All Variables Model: 627
+Based on these RMSE values, the All Variables Model is performing the best, as it has the smallest RMSE value. This also shows that although the Dose Model is not the best model compared to all of the variables as predictors, it is a major improvement over the Null Model.
+
+## Model Performance Assessment 2
+```{r}
+#Load libraries
+library(tidymodels)
+
+#Run a 10-fold cross validation to assess model performance
+
+##Reset the seed
+set.seed(1234)
+
+##Create folds
+folds <- vfold_cv(fittingdata_training, v = 10)
+
+##Run 10-fold cross validation for DOSE model
+cv_dose <- fit_resamples(
+  fit_dose,
+  resamples = folds,
+  metrics = metric_set(rmse)
+)
+
+##Run 10-fold cross validation for all variables model
+cv_all <- fit_resamples(
+  fit_all,
+  resamples = folds,
+  metrics = metric_set(rmse)
+)
+
+##Collect results
+collect_metrics(cv_dose)
+collect_metrics(cv_all)
+```
+
+## Conclusions and Comparisons of the Models using Model Assessment 2 and mean RMSEs
+The mean RMSE values predicted/calculated for the models are as follows:
+Null Model: 948.3526
+Dose Model: 691 +/- 67.5 (RMSE standard error)
+All Variables Model: 646 +/- 64.8 (RMSE standard error)
+It appears there are slight changes to how the models performed using this model assessment method. The All Variables Model still performs the best compared to the Null and Dose Models, so using all variables as predictors still remains the best model. However, the RMSE values shifted, with the Dose Model having a smaller RMSE using this second model assessment and the All Variables Model having a larger RMSE. They both appear to have a very similar standard error. This model assessment shows that although the All Variables Model is still the best model, it is much closer than previously, and that the Dose variable is driving much of the prediction.
+
+## Re-run Model Assessment with a Different Seed
+```{r}
+#Load libraries
+library(tidymodels)
+
+#Re-run a 10-fold cross validation to assess model performance
+
+##Reset the seed
+set.seed(61940)
+
+##Create folds
+folds <- vfold_cv(fittingdata_training, v = 10)
+
+##Run 10-fold cross validation for DOSE model
+cv_dose2 <- fit_resamples(
+  fit_dose,
+  resamples = folds,
+  metrics = metric_set(rmse)
+)
+
+##Run 10-fold cross validation for all variables model
+cv_all2 <- fit_resamples(
+  fit_all,
+  resamples = folds,
+  metrics = metric_set(rmse)
+)
+
+##Collect results
+collect_metrics(cv_dose2)
+collect_metrics(cv_all2)
+```
+
+## Conclusions and Comparisons of the Models using Model Assessment 2 Re-run with New Seed
+The RMSE values predicted/calculated for the models are as follows:
+Null Model: 948.3526
+Dose Model: 677 +/- 73.5 (RMSE standard error)
+All Variables Model: 621 +/- 74.4 (RMSE standard error)
+Increasing the seed lead to a better mean RMSE but higher standard error.
