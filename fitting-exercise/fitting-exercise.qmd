@@ -14,7 +14,7 @@ library(tidyr)
 library(gtsummary)
 
 #Load the data
-fittingdata <- read.csv("fitting-exercise/fittingexercisedata.csv")
+fittingdata <- read.csv("fittingexercisedata.csv")
 
 #Summarize the data
 summary(fittingdata)
