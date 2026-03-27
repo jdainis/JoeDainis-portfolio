@@ -610,3 +610,53 @@ ggplot(boot_results, aes(x = observed)) +
 ```
 
 The plot displays observed values against predicted values for Model 2, including the point estimates (black) and the 89% bootstrap confidence intervals (red/blue). While the predictions generally follow the 45-degree reference line, there is substantial scatter, indicating a large amount of unexplained variance. Notably, for higher observed values (e.g., >3000), the predictions consistently fall below the 45-degree line, revealing a systematic underestimation by the model. The bootstrap confidence intervals are relatively narrow and stable across the range of values; however, for the higher observed values, these intervals frequently fail to capture the true observed value (the 45-degree line).
+
+# This final part 3 added by Joe Dainis
+
+## Fit of Model 2 using the test data
+```{r}
+#Predict on the saved testing data using Model 2
+predicttest_all <- predict(fit_all, new_data = fittingdata_testing) %>%
+  bind_cols(fittingdata_testing)
+
+#Compute performance metrics on saved testing data
+rmse_test_all <- rmse(predicttest_all, truth = Y, estimate = .pred)
+rsq_test_all  <- rsq(predicttest_all, truth = Y, estimate = .pred)
+
+print(rmse_test_all)
+print(rsq_test_all)
+```
+
+## Plot the predicted versus observed for the fitted model used on the test data
+
+```{r}
+#Add labels to differentiate training data predictions and testing data predictions
+train_plot <- pred_all %>%
+  mutate(dataset = "Training")
+
+test_plot <- predicttest_all %>%
+  mutate(dataset = "Test")
+
+#Combine the training and testing prediction datasets into one dataframe 
+combined_plot <- bind_rows(train_plot, test_plot)
+
+#Plot the training and testing prediction values versus the observed values in one plot
+testvstraining_plot <- ggplot(combined_plot, aes(x = Y, y = .pred, color = dataset, shape = dataset)) +
+  geom_point(alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  xlim(0, 5000) + ylim(0, 5000) +
+  labs(
+    title = "Observed vs Predicted (Training vs Test Data)",
+    x = "Observed Y",
+    y = "Predicted Y"
+  ) +
+  theme_bw()
+
+testvstraining_plot
+```
+
+# Final Conclusions
+1. Overall, we have validated that the model using dose as a predictor of Y outcome as well as the model using all variables as predictors both outperformed our Null model. (RMSE = 948 for Null reduced to RMSE = ~600-700 depending on model used and assessment).
+2. Dose accounts for a majority of the predicting ability, as using all variables sees an additional but very slight improvement in predicting ability compared to using dose alone. We also see that the model applied to the testing data intermeshes quite nicely with the training data, indicating that this model was successful in its development.
+3. Overall, the results do make sense to me. It would make sense that a clinically approved drug in Mavoglurant used at higher doses would have an increasing detectable concentration of the drug. The dose model might be useful for assessing general trends, but it is not a perfect predictor and it would likely not be useful to use to predict on an individual case-by-case basis.
+4. Finally, for the All Variables model, as mentioned before it does see a slight improvement in predictive power, but still since it is only a slight improvement I would not use this on an individual case basis to predict an outcome. It does make sense that using all of the available variables would slightly improve predictive capability of the outcome, but this also proves that the main variable driving the predictive power of the model is dose, which makes sense for this dataset studying the pharmokinetics of the drug.
