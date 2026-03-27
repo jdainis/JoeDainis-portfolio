@@ -492,3 +492,121 @@ Null Model: 948.3526
 Dose Model: 677 +/- 73.5 (RMSE standard error)
 All Variables Model: 621 +/- 74.4 (RMSE standard error)
 Increasing the seed lead to a better mean RMSE but higher standard error.
+
+# This section added by Liang Lai
+
+## Model Predictions vs Observed Values
+```{r}
+# Combine predictions from all 3 models into one data frame
+plot_preds <- bind_rows(
+  fittingdata_training %>%
+    select(Y) %>%
+    mutate(.pred = mean_y,
+           model = "Null Model"),
+  pred_dose %>%
+    select(Y, .pred) %>%
+    mutate(model = "Model 1 (DOSE only)"),
+  pred_all %>%
+    select(Y, .pred) %>%
+    mutate(model = "Model 2 (All predictors)")
+)
+
+# Plot observed vs predicted
+ggplot(plot_preds, aes(x = Y, y = .pred, 
+                       color = model, shape = model)) +
+  geom_point(alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  xlim(0, 5000) + ylim(0, 5000) +
+  labs(
+    title = "Observed vs Predicted Values",
+    x = "Observed",
+    y = "Predicted",
+    color = "Model",
+    shape = "Model"
+  ) +
+  theme_bw()
+```
+
+The null model predicts a single horizontal line (the mean), Model 1 produces three horizontal lines corresponding to the three dose levels, and Model 2 best follows the 45-degree line but still shows notable scatter, especially underestimating higher observed values.
+
+
+## Residual Plot for Model 2
+```{r}
+# Compute residuals for Model 2
+resid_data <- pred_all %>%
+  mutate(residual = .pred - Y)
+
+# Plot predicted vs residuals
+ggplot(resid_data, aes(x = .pred, y = residual)) +
+  geom_point(alpha = 0.6) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  ylim(-2500, 2500) +
+  labs(
+    title = "Predicted vs Residuals (Model 2)",
+    x = "Predicted",
+    y = "Residuals"
+  ) +
+  theme_bw()
+```
+
+The residual plot shows considerable scatter and a noticeable spreading trend as predicted values increase. This suggests that the model's errors are not constant across the range of predictions, indicating potential heteroscedasticity and that the model may be underfitting the data, especially at higher predicted values.
+
+## Bootstrap Uncertainty for Model 2
+```{r}
+# Reset seed
+set.seed(1234)
+
+# Create 100 bootstraps from training data
+dat_bs <- bootstraps(fittingdata_training, times = 100)
+
+# Store predictions in a matrix
+pred_bs <- matrix(NA,
+                  nrow = 100,
+                  ncol = nrow(fittingdata_training))
+
+# Loop over bootstrap samples and fit model to each sample
+for (i in 1:100) {
+  dat_sample <- rsample::analysis(dat_bs$splits[[i]])
+  fit_i <- fit(model_all, data = dat_sample)
+  pred_bs[i, ] <- predict(fit_i,
+                          new_data = fittingdata_training)$.pred
+}
+
+# Compute median and 89% confidence intervals across bootstrap samples
+preds <- pred_bs |>
+  apply(2, quantile, c(0.055, 0.5, 0.945)) |> t()
+
+# Combine original predictions, bootstrap median and CI into one data frame
+boot_results <- tibble(
+  observed = fittingdata_training$Y,
+  original = pred_all$.pred,
+  lower    = preds[, 1],
+  median   = preds[, 2],
+  upper    = preds[, 3]
+)
+
+# Plot observed vs predicted with bootstrap uncertainty
+# Black = original predictions, Blue = bootstrap median, Red = 89% CI bounds
+ggplot(boot_results, aes(x = observed)) +
+  # Draw vertical lines connecting lower and upper CI bounds
+  geom_segment(aes(xend = observed, y = lower, yend = upper),
+               color = "lightblue", alpha = 0.5) +
+  # Plot lower and upper CI bounds in red
+  geom_point(aes(y = lower), color = "red", alpha = 0.5) +
+  geom_point(aes(y = upper), color = "red", alpha = 0.5) +
+  # Plot bootstrap median in blue
+  geom_point(aes(y = median), color = "blue", alpha = 0.5) +
+  # Plot original predictions in black (on top)
+  geom_point(aes(y = original), color = "black") +
+  # Add 45-degree reference line
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  xlim(0, 5000) + ylim(0, 5000) +
+  labs(
+    title = "Bootstrap Predictions with Uncertainty (Model 2)",
+    x = "Observed",
+    y = "Predicted"
+  ) +
+  theme_bw()
+```
+
+The plot displays observed values against predicted values for Model 2, including the point estimates (black) and the 89% bootstrap confidence intervals (red/blue). While the predictions generally follow the 45-degree reference line, there is substantial scatter, indicating a large amount of unexplained variance. Notably, for higher observed values (e.g., >3000), the predictions consistently fall below the 45-degree line, revealing a systematic underestimation by the model. The bootstrap confidence intervals are relatively narrow and stable across the range of values; however, for the higher observed values, these intervals frequently fail to capture the true observed value (the 45-degree line).
