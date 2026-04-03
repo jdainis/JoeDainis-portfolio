@@ -82,6 +82,9 @@ analysis_fittingdata %>%
       all_categorical() ~ "{n} / {N} ({p}%)"
     )
   )
+
+#Save analysis_fittingdata as an RDS file
+saveRDS(analysis_fittingdata, file = "analysis_fittingdata.rds")
 ```
 
 ### Conclusion: This table shows that many of the participants in the study received either a dose of 25 or 50, with a smaller representation for the medium dosage. There also appears to be a major skew towards one sex, and a large skew towards one race.

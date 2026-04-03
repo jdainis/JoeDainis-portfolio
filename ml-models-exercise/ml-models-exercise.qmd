@@ -1,0 +1,237 @@
+---
+title: "Machine Learning Models Exercise Joe Dainis"
+---
+
+## Load libraries, data and create correlation plot
+```{r}
+#Ensure packages are installed if necessary
+#Load necessary libraries
+library(dplyr)
+library(purrr)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(gtsummary)
+library(GGally)
+library(glmnet)
+library(ranger)
+library(tidymodels)
+library(yardstick)
+
+
+#Set seed for reproducibility
+set.seed(1234)
+rngseed <- 1234
+```
+
+```{r}
+#Load the data
+mldata <- readRDS("analysis_fittingdata.rds")
+
+#Mutate data so that RACE is a value of 1, 2 or 3
+##Convert race to a numeric value
+ml_fittingdata <- mldata %>%
+  mutate(
+    RACE = as.numeric(as.character(RACE)),
+    RACE = case_when(
+      RACE %in% c(7, 88) ~ 3,
+      TRUE ~ RACE
+    ),
+    RACE = factor(RACE),
+    SEX  = factor(SEX)
+  ) %>%
+  select(Y, DOSE, AGE, SEX, RACE, WT, HT)
+
+#Develop a pairwise correlation for the continuous variables in this dataset
+##Select the continuous variables
+continuous_vars <- ml_fittingdata %>%
+  select(where(is.numeric))
+
+#Make the correlation plot
+ggpairs(continuous_vars)
+```
+
+## Compute the BMI variable
+```{r}
+#BMI formula
+#BMI = (weight(kg)) / ((height(m))^2)
+#It appears weight is in kilograms and height is in meters in this dataset, so use the formula as is to calculate BMI
+ml_fittingdata <- ml_fittingdata %>%
+  mutate(
+    BMI = WT / ( (HT)^2 )
+  )
+```
+
+# Fit Models using TidyModels Workflows/Recipes
+
+```{r}
+#Create recipe to be used in later models, using Y as the predicted variable and all other variables as predictors
+recipe <- recipe(Y ~ ., data = ml_fittingdata) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_numeric_predictors())
+
+#Generate Linear Model
+##Create Linear Model
+linear_model <- linear_reg() %>%
+  set_engine("lm")
+
+##Create workflow for linear model incorporating the previously created recipe
+linear_workflow <- workflow() %>%
+  add_model(linear_model) %>%
+  add_recipe(recipe)
+
+##Fit the linear model to the data to make predictions
+linear_fit <- fit(linear_workflow, data = ml_fittingdata)
+
+#Generate LASSO Model
+##Create LASSO Model
+lasso_model <- linear_reg(penalty = 0.1, mixture = 1) %>%
+  set_engine("glmnet")
+
+##Create workflow for LASSO model incorporating the previously created recipe
+lasso_workflow <- workflow() %>%
+  add_model(lasso_model) %>%
+  add_recipe(recipe)
+
+##Fit the LASSO model to the data to make predictions
+lasso_fit <- fit(lasso_workflow, data = ml_fittingdata)
+
+#Generate Random Forest Model
+##Create Random Forest Model
+forest_model <- rand_forest() %>%
+  set_engine("ranger", seed = rngseed) %>%
+  set_mode("regression")
+
+##Create workflow for Random Forest model incorporating the previously created recipe
+forest_workflow <- workflow() %>%
+  add_model(forest_model) %>%
+  add_recipe(recipe)
+
+##Fit the Random Forest model to the data to make predictions
+forest_fit <- fit(forest_workflow, data = ml_fittingdata)
+```
+
+## Evaluations of the three models
+
+```{r}
+#Create a function which will evaluate the model by generated RMSE values after providing which fitted model is being used, the data it was fit to, and the name of the model
+evaluate_model <- function(fit, data, name) {
+  
+  preds <- predict(fit, data) %>%
+    bind_cols(data)
+  
+  rmse_val <- rmse(preds, truth = Y, estimate = .pred)
+  
+  print(paste(name, "RMSE:"))
+  print(rmse_val)
+  
+  ggplot(preds, aes(x = Y, y = .pred)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "red") +
+    labs(title = paste("Observed vs Predicted -", name))
+}
+
+#Run evaluate_model for the Linear, LASSO and Random Forest Models
+evaluate_model(linear_fit, ml_fittingdata, "Linear Model")
+evaluate_model(lasso_fit, ml_fittingdata, "LASSO")
+evaluate_model(forest_fit, ml_fittingdata, "Random Forest")
+```
+
+The likely reason the linear model and LASSO model provided the same RMSE is because the predictors we used included all of the variables, meaning that the relevant features were selected and that there were no penalties applied to the model.
+
+# Tuning the Models
+
+## LASSO Tuning with no Cross Validation
+```{r}
+#Define a grid of parameters in a tibble
+penalty_grid <- tibble(
+  penalty = 10^seq(-5, 2, length.out = 50)
+)
+
+#Tune the LASSO model using the new penalty grid
+lasso_tune_model <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_engine("glmnet")
+
+##Create workflow for LASSO model incorporating the previously created recipe
+lasso_tune_workflow <- workflow() %>%
+  add_model(lasso_tune_model) %>%
+  add_recipe(recipe)
+
+##Fit the LASSO model to the data to make predictions
+lasso_tune_resample <- tune_grid(
+  lasso_tune_workflow,
+  resamples = apparent(ml_fittingdata),
+  grid = penalty_grid
+)
+
+#autoplot(lasso_tune_resample) #Autoplot() did not work for me in this instance. Show metrics of LASSO model.
+lasso_metrics <- collect_metrics(lasso_tune_resample)
+lasso_metrics
+```
+
+## Tuning the Random Forest Model with no Cross Validation
+```{r}
+rf_tune_model <- rand_forest(
+  mtry = tune(),
+  min_n = tune(),
+  trees = 300
+) %>%
+  set_engine("ranger", seed = rngseed) %>%
+  set_mode("regression")
+
+rf_tune_workflow <- workflow() %>%
+  add_model(rf_tune_model) %>%
+  add_recipe(recipe)
+
+rf_grid <- grid_regular(
+  mtry(range = c(1, 7)),
+  min_n(range = c(1, 21)),
+  levels = 7
+)
+
+rf_tune_resample <- tune_grid(
+  rf_tune_workflow,
+  resamples = apparent(ml_fittingdata),
+  grid = rf_grid
+)
+
+#autoplot(rf_tune_resample) Autoplot does not work for me in this instance. Show metrics of random forest plot.
+rf_metrics <- collect_metrics(rf_tune_resample)
+rf_metrics
+```
+
+## LASSO and Random Forest Cross Validated Tuning
+```{r}
+#Set Seed
+set.seed(1234)
+
+#Create a resampled object using vfold_cv with 5 cross-validations and 5 repears
+cv_folds <- vfold_cv(
+  ml_fittingdata,
+  v = 5,
+  repeats = 5
+)
+
+#LASSO CV Tuning
+lasso_cv_resample <- tune_grid(
+  lasso_tune_workflow,
+  resamples = cv_folds,
+  grid = penalty_grid
+)
+
+autoplot(lasso_cv_resample)
+
+#Random Forest Model CV Tuning
+rf_cv_resample <- tune_grid(
+  rf_tune_workflow,
+  resamples = cv_folds,
+  grid = rf_grid
+)
+
+autoplot(rf_cv_resample)
+```
+
+The cross-validated model performs better because it is not overfitting the data, whereas using the training data for the non-cross-validated versions overfit the data (hence why both the LASSO and Random Forest models with no cross validation have lower RMSEs).
+The LASSO model outperforms the Random Forest model because with the cross-validation, the Random Forest model will have a higher variance due to the high flexibility of the model. Our dataset is much simpler and smaller, which will even further increase the variance seen in the Random Forest model even with cross-validation.
