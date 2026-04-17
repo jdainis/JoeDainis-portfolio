@@ -5,7 +5,7 @@ project:
     - "presentation-exercise/*.png"  # This forces Quarto to copy all PNGs in that folder
 
 website:
-  title: "My Portfoli-Joe: Joe Dainis's Portfolio"
+  title: "My Portfoli-Joe: Joe Dainis's Portfolio!"
   navbar:
     left:
       - text: "About Me"
