@@ -1,0 +1,261 @@
+---
+title: "Tidy Tuesday Exercise Joe Dainis"
+---
+
+# Load TidyTuesday Data, necessary libraries and set seed for downstream modeling
+```{r}
+#Load necessary libraries
+library(tidyverse)
+library(tidymodels)
+library(themis)
+library(vip)
+library(janitor)
+library(scales)
+library(knitr)
+library(yardstick)
+
+#Load data (using direct CSV from github)
+birds <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2026/2026-04-14/birds.csv')
+ships <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2026/2026-04-14/ships.csv')
+
+#Add optional setting preferences and set the seed
+theme_set(theme_bw())
+options(yardstick.event_first = TRUE)
+set.seed(123)
+```
+
+# Outcome creation: what are we trying to investigate with this data?
+After perusing the data, we can see that this is a compilation of four datasets for this week's TidyTuesday: ships, birds, sea_states and beaufort_scale. "Ships" compiles all of the weather and logistical observations from the ship that for a particular observation period, including date, time, location, and weather-related patterns. "Birds" compiles all of the different bird species spotted during the same observation periods as the "Ships" dataset. The final two datasets, sea_states and beaufort_scale, provide data that explains the numerical classifications using these scales: sea_states provides descriptions of the wave conditions and beaufort_scale provides descriptions of the wind conditions. Taking all of this in, I felt an appropriate question to ask would investigate how three different weather patterns could affect the spotting of the White-chinned Petrel.
+
+Question: How do weather-related conditions, including wind speed, cloud coverage, and water conditions affect the presence of the White-chinned petrel?
+
+Hypothesis: White-chinned petrels are frequent divers in the ocean, using this technique to dive for food. I hypothesize that strong weathers patterns, including high wind speeds, choppy waters and increased cloud coverage, would increase presence, as the petrel might sense a storm approaching and opt to hunt for food now rather than later, increasing divings and ultimately spottings. 
+
+```{r}
+#Create the outcome we are looking to predict, which is how presence of the White-chinned petrel is affected by three different factors: wind speed (Beaufort scale), sea state and cloud cover
+wc_petrel_data <- birds |>
+  left_join(ships, by = "record_id") |> #Joins ships and birds by record_ID, which they both share
+  mutate(is_wc_petrel = species_scientific_name == "Procellaria aequinoctialis") |> #Creates a column which confirms if a observation is a white-chinned petrel
+  group_by(record_id) |>
+  summarise(
+    present = any(is_wc_petrel, na.rm = TRUE),
+    wind_speed_class = first(wind_speed_class),
+    sea_state_class = first(sea_state_class),
+    cloud_cover_raw = first(cloud_cover),
+    .groups = "drop"
+  ) |> #Summarizes the data, and specifically provides a count of presence in the mutated is_wc_petrel column
+  mutate(
+    #Map the text categories to a numeric scale, which follows the set categories defined online for the cloud cover range (0 = clear, 4 = partially cloudy, 8 = overcast)
+    cloud_cover = case_when(
+      cloud_cover_raw == "clear" ~ 0,
+      cloud_cover_raw == "partially cloudy" ~ 4,
+      cloud_cover_raw == "overcast" ~ 8,
+      TRUE ~ NA_real_
+    ),
+    wind_speed_class = as.numeric(wind_speed_class), #Converts wind_speed to numeric
+    sea_state_class = as.numeric(sea_state_class) #Converts sea state class to numeric
+  ) |>
+  #Filter to remove NAs
+  filter(!is.na(wind_speed_class), 
+         !is.na(sea_state_class), 
+         !is.na(cloud_cover)) |>
+  mutate(
+    present = factor(if_else(present, "present", "absent"), 
+                     levels = c("absent", "present"))
+  )
+```
+
+```{r}
+#Graph 1: Plot the Percent of White-chinned Petrels present by sea state
+p1 <- wc_petrel_data |>
+  group_by(sea_state_class) |>
+  summarise(prop = mean(present == "present")) |>
+  ggplot(aes(x = factor(sea_state_class), y = prop)) +
+  geom_col(fill = "steelblue") +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Presence vs Sea State", x = "Sea State", y = "% Present White-chinned Petrel")
+
+p1
+```
+
+We see that there appears to be a positive correlation between sea state and percent presence of White-chinned petrels, with a higher percent seen in rougher recorded water states (sea states 5 and 6).
+
+```{r}
+#Graph 2: Plot the Percent of Present White-chinned Petrels present by cloud conditions
+p2 <- wc_petrel_data |>
+  group_by(cloud_cover) |>
+  summarise(prop = mean(present == "present")) |>
+  ggplot(aes(x = factor(cloud_cover), y = prop)) +
+  geom_col(fill = "skyblue") +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Presence vs Cloud Cover", x = "Cloud Cover (0 = Clear, 4 = Partially Cloudy, 8 = Overcast)", y = "% Present White-chinned Petrel")
+
+p2
+```
+
+We see that there does not appear to be any obvious trends between cloud cover and White-chinned Petrel presence.
+
+```{r}
+#Graph 3: Plot the Percent of Present White-chinned Petrels present by beaufort scaled wind speeds
+p3 <- wc_petrel_data |>
+  group_by(wind_speed_class) |>
+  summarise(prop = mean(present == "present")) |>
+  ggplot(aes(x = factor(wind_speed_class), y = prop)) +
+  geom_col(fill = "darkblue") +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Presence vs Beaufort", x = "Beaufort Scale", y = "% Present")
+
+p3
+```
+
+We see that there does appear to be a positive trend between Beaufort recordings and percent of present White-chinned Petrels, with higher Beaufort scale recordings (which translated to faster recorded wind speeds) associating with a higher percent presence of White-chinned Petrels.
+
+# Modeling: Run Linear and Random Forest
+```{r}
+#Split the data into training data and testing data
+data_split <- initial_split(wc_petrel_data, prop = 0.75, strata = present)
+train_data <- training(data_split)
+test_data  <- testing(data_split)
+
+#Creat a recipe with downsampling to balance the 'absent' and 'present' classes
+wc_recipe <- recipe(present ~ sea_state_class + cloud_cover + wind_speed_class, data = train_data) |>
+  step_downsample(present)
+
+#Generate Linear Model
+##Create Linear Model
+linear_model <- logistic_reg() %>%
+  set_engine("glm") %>%
+  set_mode("classification")
+
+##Create workflow for linear model incorporating the previously created recipe
+linear_workflow <- workflow() %>%
+  add_model(linear_model) %>%
+  add_recipe(wc_recipe)
+
+##Fit the linear model to the data to make predictions
+linear_fit <- fit(linear_workflow, data = train_data)
+
+#Run Linear and Random Forest modeling
+#Random Forest Model
+rf_spec <- rand_forest(trees = 500) |>
+  set_mode("classification") |>
+  set_engine("ranger", importance = "impurity")
+
+#Fit the final model workflow
+forest_workflow <- workflow() |>
+  add_recipe(wc_recipe) |>
+  add_model(rf_spec)
+
+forest_fit <- forest_workflow |>
+  last_fit(data_split)
+
+#Collect performance metrics on test data for random forest
+collect_metrics(forest_fit) |> kable(caption = "Final Test Set Performance")
+
+#Evaluate the model
+evaluate_model <- function(fit, data, name) {
+  
+  preds <- predict(fit, data, type = "prob") %>%
+    bind_cols(predict(fit, data)) %>%
+    bind_cols(data)
+  
+  print(paste(name, "Accuracy:"))
+  print(accuracy(preds, truth = present, estimate = .pred_class))
+  
+  print(paste(name, "ROC AUC:"))
+  print(roc_auc(preds, truth = present, .pred_present, event_level = "second"))
+}
+
+evaluate_model(linear_fit, test_data, "Logistic Model")
+evaluate_model(forest_fit$.workflow[[1]], test_data, "Random Forest")
+
+#Model Evaluation: Plotting
+##Random Forest
+rf_preds <- forest_fit %>%
+  collect_predictions() %>%
+  mutate(
+    .pred_class = if_else(.pred_present > 0.3, "present", "absent") %>%
+      factor(levels = c("absent", "present"))
+  )
+
+rf_preds %>%
+  roc_curve(truth = present, .pred_present) %>%
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) +
+  geom_path(color = "darkblue", size = 1) +
+  geom_abline(lty = 2, color = "gray") +
+  labs(
+    title = "ROC Curve - Random Forest",
+    x = "False Positive Rate",
+    y = "True Positive Rate"
+  )
+
+##Logistic Model
+log_preds <- predict(linear_fit, test_data, type = "prob") %>%
+  bind_cols(predict(linear_fit, test_data)) %>%
+  bind_cols(test_data)
+
+log_preds %>%
+  roc_curve(truth = present, .pred_present) %>%
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) +
+  geom_path(color = "red", size = 1) +
+  geom_abline(lty = 2) +
+  labs(title = "ROC Curve - Logistic Regression")
+
+##Overlay of the ROC from both logistic and Random Forest models
+rf_curve <- rf_preds %>%
+  roc_curve(truth = present, .pred_present) %>%
+  mutate(model = "Random Forest")
+
+log_curve <- log_preds %>%
+  roc_curve(truth = present, .pred_present) %>%
+  mutate(model = "Logistic")
+
+bind_rows(rf_curve, log_curve) %>%
+  ggplot(aes(x = 1 - specificity, y = sensitivity, color = model)) +
+  geom_path(size = 1.2) +
+  geom_abline(lty = 2) +
+  labs(title = "ROC Curve Comparison")
+
+#Confusion Matrix
+#Random Forest
+rf_preds %>%
+  conf_mat(truth = present, estimate = .pred_class) %>%
+  autoplot(type = "heatmap")
+
+##Logistic Model
+log_preds %>%
+  conf_mat(truth = present, estimate = .pred_class) %>%
+  autoplot(type = "heatmap")
+
+#Create a plot which looks at the variable importance score, which scores the impact of each variable in the random forest model
+forest_fit$.workflow[[1]] |>
+  extract_fit_parsnip() |>
+  vip(geom = "point", aesthetics = list(size = 4, color = "darkred")) +
+  labs(title = "Variable Importance Scores",
+       subtitle = "Which factor most influences White-chinned Petrel presence?")
+
+#Compare solo-factor performance via Cross-Validation
+cv_folds <- vfold_cv(train_data, v = 5, strata = present)
+
+#Create recipes for individual factors
+rec_wind  <- recipe(present ~ wind_speed_class, data = train_data) |> step_downsample(present)
+rec_sea   <- recipe(present ~ sea_state_class,  data = train_data) |> step_downsample(present)
+rec_cloud <- recipe(present ~ cloud_cover,      data = train_data) |> step_downsample(present)
+
+#Create a workflow that will run models using the individual recipes above
+individual_results <- workflow_set(
+  preproc = list(wind = rec_wind, sea = rec_sea, cloud = rec_cloud),
+  models = list(rf = rf_spec)
+) |>
+  workflow_map("fit_resamples", resamples = cv_folds, metrics = metric_set(accuracy, roc_auc))
+
+#Collect metrics for accuracy and ROC AUC
+collect_metrics(individual_results) |>
+  select(wflow_id, .metric, mean) |>
+  pivot_wider(names_from = .metric, values_from = mean) |>
+  arrange(desc(roc_auc)) |>
+  kable(caption = "Individual Factor Performance")
+```
+
+# Conclusions and Interpretations
+For this modeling approach, I used two different metrics: accuracy and ROC AUC. Both metrics are appropriate to evaluate binary outcomes, such as presence/absence. Accuracy is the percentage of correct outcomes predicted by the model, whereas the ROC AUC indicates whether the model is able to predict positive outcomes (presence) better than negative outcomes (absence) An accuracy or ROC AUC of 0.5 means that the model has no predictive power and is no better than random guessing. Any value above 0.5 indicates predictive power of the model. The logistical regression model used generated an accuracy of 0.538 ROC AUC value of 0.624. This indicates that the logistical regression model has an accuracy no better than randomly guessing presences versus absences, but does have some predictive power in predicting the true positive presences. The Random Forest model, however, had an accuracy of 0.63 and a ROC AUC of 0.685. Both metrics were better than the logistical regression, indicating that although it is still only a somewhat strong preditice power, the three predictor variables of sea state, beaufort scale and cloud coverage have some predictive power. However, since the accuracy is still quite low, this indicates that there are definitely other variables in the dataset, likely other weather-related variables such as barometric pressure and rain pattern, that could further improve the accuracy of predicting White-chinned Petrel presence. Looking at the Variable Importance Score, which indicates how critical that variable is to the predictive power of the model on an individual basis, we can see that it appears as though the beaufort scale/wind-speed drove the majority of the predictive power. However, interesingly enough, when running the individual factor performances, it looks as though wind-speed and cloud coverage acted the best (accuracy = 0.634 and 0.646 respectively), with sea state having an accuracy closer to 0.5 (0.562).
